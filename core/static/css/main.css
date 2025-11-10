@@ -1,0 +1,31 @@
+/* Gold-accent theme for Dust2Cash */
+:root{
+  --gold: #C49A3A;
+  --gold-dark: #a57f2f;
+  --muted: #6c757d;
+  --bg: #f8f9fa;
+}
+
+body { background: var(--bg); color: #222; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+/* Navbar / brand */
+.brand-title { font-weight: 700; color: #111; letter-spacing: .2px; }
+.navbar .btn-gold, .btn-gold {
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 18px rgba(196,154,58,0.14);
+}
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(196,154,58,0.18); }
+
+/* Cards & headings */
+.card { border-radius: 12px; }
+h1,h2,h3 { color: #111; }
+
+/* tiny responsive tweaks */
+@media (max-width: 768px){
+  .display-5 { font-size: 1.9rem; }
+}
+
+/* form focus */
+.form-control:focus { box-shadow: 0 0 0 .15rem rgba(196,154,58,0.15); border-color: var(--gold-dark); }
