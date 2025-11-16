@@ -1,6 +1,7 @@
 
 from django.shortcuts import render, redirect
-from .forms import LoginForm, forms
+from django import forms
+from .forms import LoginForm
 
 def landing(request):
     return render(request, 'landing.html')
