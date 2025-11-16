@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+:root {
+  --gold: #C49A3A;
+  --gold-dark: #a57f2f;
+  --bg: #121212;
+  --text: #eaeaea;
+  --card-bg: #1e1e1e;
+  --input-bg: #2a2a2a;
+  --neon: #00ffe7;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navbar / brand */
+.brand-title {
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.navbar {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid rgba(196,154,58,0.2);
+}
+
+.btn-gold {
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(196,154,58,0.2);
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(196,154,58,0.3);
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: var(--gold);
+}
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid rgba(196,154,58,0.2);
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  padding: 1.5rem;
+}
+
+/* Form fields */
+.form-control {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid rgba(196,154,58,0.3);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+.form-control:focus {
+  box-shadow: 0 0 6px rgba(196,154,58,0.3);
+  border-color: var(--gold-dark);
+}
+
+/* Crypto glow effect */
+.crypto-glow {
+  color: var(--neon);
+  text-shadow: 0 0 6px var(--neon);
+  font-weight: 600;
+}
+
+/* Footer */
+footer {
+  background-color: var(--card-bg);
+  color: var(--text);
+  font-size: 14px;
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid rgba(196,154,58,0.2);
+}
+footer a {
+  color: var(--gold);
+  text-decoration: none;
+}
+footer i {
+  color: var(--neon);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .display-5 { font-size: 1.9rem; }
+  .card { padding: 1rem; }
+}

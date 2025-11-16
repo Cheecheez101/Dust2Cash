@@ -1,4 +1,3 @@
-{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,41 +7,45 @@
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="/static/css/main.css" rel="stylesheet">
 
   <meta name="description" content="Convert small crypto balances into mobile money — simple, fair and transparent.">
+  <link rel="icon" href="/static/favicon.png">
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-white shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="{% url 'landing' %}">
-      <img src="{% static 'img/logo-small.png' %}" alt="Dust2Cash" style="height:36px; margin-right:8px;">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
       <span class="brand-title">Dust2Cash</span>
     </a>
 
     <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark" href="{% url 'login' %}">Login</a>
-      <a class="btn btn-gold" href="{% url 'signup' %}">Get Started</a>
+      <a class="btn btn-outline-dark" href="/login">Login</a>
+      <a class="btn btn-gold" href="/login">Get Started</a>
     </div>
   </div>
 </nav>
 
-<header class="py-6">
+<header class="py-5">
   <div class="container">
     <div class="row align-items-center gy-4">
       <div class="col-lg-7">
         <h1 class="display-5 fw-bold">Dust2Cash — your dust, your cash</h1>
-        <p class="lead">Convert small crypto balances (even 5 USDT) into M-Pesa or Airtel Money — fast, fair and transparent. Transaction fee included. <strong>No hidden charges.</strong></p>
+        <p class="lead">
+          Convert small crypto balances (even 5 USDT) into M-Pesa or Airtel Money — fast, fair, and transparent.
+          Transaction fee included. <strong>No hidden charges.</strong>
+        </p>
 
         <div class="mt-4">
-          <a class="btn btn-gold btn-lg me-2" href="{% url 'signup' %}">Create Account</a>
+          <a class="btn btn-gold btn-lg me-2" href="/login">Create Account</a>
           <a class="btn btn-outline-secondary btn-lg" href="#how-it-works">How it works</a>
         </div>
 
         <ul class="list-unstyled mt-5 small text-muted">
           <li><strong>Platform friendly:</strong> Binance → Binance, Bybit → Bybit — no cross-platform fees.</li>
-          <li><strong>Multiple payouts:</strong> M-Pesa &amp; Airtel Money supported.</li>
+          <li><strong>Multiple payouts:</strong> M-Pesa & Airtel Money supported.</li>
           <li><strong>Transparent:</strong> Slogan — “Dust2Cash, your dust your cash, with clear transaction cost.”</li>
         </ul>
       </div>
@@ -54,9 +57,8 @@
             <p class="mb-1">1 USDT = <span class="fs-5 fw-semibold">KSH {{ settings.buying_rate_per_usdt|default:"100.00" }}</span></p>
             <p class="mb-1">Transaction fee: <strong>{{ settings.transaction_fee_percent|default:"1.50" }}%</strong></p>
             <p class="mb-0">Min trade: <strong>{{ settings.min_trade_amount_usdt|default:"5.00" }} USDT</strong></p>
-
             <hr>
-            <p class="mb-0 small text-muted">Before transferring, make sure an <strong>Agent is online</strong>. If none are online, request assistance — you'll be notified when an Agent becomes active.</p>
+            <p class="mb-0 small text-muted">Before transferring, ensure an <strong>Agent is online</strong>. If none are online, request assistance — you'll be notified when an Agent becomes active.</p>
           </div>
         </div>
 
@@ -95,7 +97,7 @@
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-body">
             <h5 class="card-title">3. Send crypto & receive mobile money</h5>
-            <p class="card-text">Choose platform, currency and amount. Send crypto to the provided address/QR. When Agent confirms receipt, we pay out to your M-Pesa or Airtel Money.</p>
+            <p class="card-text">Choose platform, currency, and amount. Send crypto to the provided address/QR. When Agent confirms receipt, we pay out to your M-Pesa or Airtel Money.</p>
           </div>
         </div>
       </div>
@@ -124,7 +126,7 @@
 
 <footer class="py-4 bg-light">
   <div class="container text-center small text-muted">
-    © {{ now.year }} Dust2Cash · <span class="text-muted">Your dust, your cash — clear transaction cost</span>
+    © {{ now.year|default:"2025" }} Dust2Cash · <span class="text-muted">Your dust, your cash — clear transaction cost</span>
   </div>
 </footer>
 
