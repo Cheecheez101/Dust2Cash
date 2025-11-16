@@ -13,7 +13,8 @@ urlpatterns = [
     path('client/transaction/create/', views.create_transaction, name='create_transaction'),
     path('client/transaction/<int:transaction_id>/request-agent/', views.request_agent, name='request_agent'),
     path('client/transaction/<int:transaction_id>/address/', views.request_address, name='request_address'),
-    
+
+    path('agent/login/', views.agent_login, name='agent_login'),
     path('agent/portal/', views.agent_portal, name='agent_portal'),
     path('agent/request/<int:request_id>/accept/', views.agent_accept_request, name='agent_accept_request'),
     path('agent/transaction/<int:transaction_id>/provide-address/', views.agent_provide_address, name='agent_provide_address'),

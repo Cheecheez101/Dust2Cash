@@ -180,6 +180,22 @@ def request_address(request, transaction_id):
     return render(request, 'client/request_address.html', {'transaction': transaction})
 
 
+def agent_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None and hasattr(user, 'agent_profile'):
+            login(request, user)
+            return redirect('agent_portal')
+        else:
+            messages.error(request, 'Invalid credentials or not an agent.')
+            return redirect('agent_login')
+
+    return render(request, 'agent/login.html')
+
+
 @agent_required
 def agent_portal(request):
     agent = request.user.agent_profile

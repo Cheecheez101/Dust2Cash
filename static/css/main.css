@@ -1,81 +1,90 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
 
 :root {
-  --gold: #C49A3A;
-  --gold-dark: #a57f2f;
-  --bg: #121212;
-  --text: #eaeaea;
-  --card-bg: #1e1e1e;
-  --input-bg: #2a2a2a;
-  --neon: #00ffe7;
+  --primary: #2c2c2c;
+  --accent: #00ffe7;
+  --accent-soft: rgba(0, 255, 231, 0.2);
+  --bg: #f9f9f9;
+  --text: #1a1a1a;
+  --card-bg: #ffffff;
+  --input-bg: #f0f0f0;
+  --border: #dcdcdc;
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
   font-family: 'Montserrat', sans-serif;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 /* Navbar / brand */
-.brand-title {
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
 .navbar {
   background-color: var(--card-bg);
-  border-bottom: 1px solid rgba(196,154,58,0.2);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
 }
 
-.btn-gold {
-  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
-  color: #fff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(196,154,58,0.2);
-  transition: all 0.3s ease;
+.brand-title {
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 1.2rem;
 }
-.btn-gold:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(196,154,58,0.3);
+
+/* Buttons */
+.btn-accent {
+  background-color: var(--accent);
+  color: var(--primary);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px var(--accent-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 255, 231, 0.4);
 }
 
 /* Headings */
 h1, h2, h3 {
-  color: var(--gold);
+  color: var(--primary);
+  font-weight: 600;
 }
 
 /* Cards */
 .card {
-  background: var(--card-bg);
+  background-color: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid rgba(196,154,58,0.2);
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  box-shadow: 0 0 12px rgba(0, 255, 231, 0.05);
   padding: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Form fields */
 .form-control {
-  background: var(--input-bg);
+  background-color: var(--input-bg);
   color: var(--text);
-  border: 1px solid rgba(196,154,58,0.3);
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 10px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .form-control:focus {
-  box-shadow: 0 0 6px rgba(196,154,58,0.3);
-  border-color: var(--gold-dark);
+  border-color: var(--accent);
+  box-shadow: 0 0 6px var(--accent-soft);
+  outline: none;
 }
 
 /* Crypto glow effect */
 .crypto-glow {
-  color: var(--neon);
-  text-shadow: 0 0 6px var(--neon);
+  color: var(--accent);
+  text-shadow: 0 0 6px var(--accent);
   font-weight: 600;
 }
 
@@ -83,17 +92,20 @@ h1, h2, h3 {
 footer {
   background-color: var(--card-bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 1rem;
   text-align: center;
-  border-top: 1px solid rgba(196,154,58,0.2);
+  border-top: 1px solid var(--border);
 }
 footer a {
-  color: var(--gold);
+  color: var(--primary);
   text-decoration: none;
 }
+footer a:hover {
+  text-decoration: underline;
+}
 footer i {
-  color: var(--neon);
+  color: var(--accent);
 }
 
 /* Responsive tweaks */
