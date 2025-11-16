@@ -1,0 +1,114 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Create Transaction - Dust2Cash</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
+      <span class="brand-title">Dust2Cash</span>
+    </a>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'client_dashboard' %}">Dashboard</a>
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-5">
+          <h2 class="mb-3">Create New Transaction</h2>
+          
+          {% if not agent_online %}
+            <div class="alert alert-warning">
+              <strong>No agent is currently online.</strong> You can still create your transaction, and you'll be able to request agent assistance afterward.
+            </div>
+          {% endif %}
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" id="transactionForm">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label class="form-label">Platform *</label>
+              {{ form.platform }}
+              {% if form.platform.errors %}<div class="text-danger small">{{ form.platform.errors.0 }}</div>{% endif %}
+              <div class="form-text">Same-platform transfers have no cross-platform fees</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Currency *</label>
+              {{ form.currency }}
+              {% if form.currency.errors %}<div class="text-danger small">{{ form.currency.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Amount *</label>
+              {{ form.amount }}
+              {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors.0 }}</div>{% endif %}
+              <div class="form-text">Minimum: 5 USDT</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Payment Method *</label>
+              {{ form.payment_method }}
+              {% if form.payment_method.errors %}<div class="text-danger small">{{ form.payment_method.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Payment Phone Number *</label>
+              {{ form.payment_phone }}
+              {% if form.payment_phone.errors %}<div class="text-danger small">{{ form.payment_phone.errors.0 }}</div>{% endif %}
+              <div class="form-text">Enter the M-Pesa or Airtel Money number for payment</div>
+            </div>
+
+            <div class="card bg-light border-0 p-3 mb-4">
+              <h6 class="mb-2">Estimated Payout</h6>
+              <p class="mb-1">Exchange Rate: <strong>1 USDT = KSH 100</strong></p>
+              <p class="mb-0 fs-5 fw-bold text-success" id="estimatedAmount">
+                Enter amount to see payout
+              </p>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-gold btn-lg" type="submit">Create Transaction</button>
+              <a href="{% url 'client_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('id_amount').addEventListener('input', function() {
+  const amount = parseFloat(this.value) || 0;
+  const exchangeRate = 100;
+  const total = amount * exchangeRate;
+  document.getElementById('estimatedAmount').textContent = 
+    amount > 0 ? `You will receive: KSH ${total.toFixed(2)}` : 'Enter amount to see payout';
+});
+</script>
+</body>
+</html>
