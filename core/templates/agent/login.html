@@ -4,53 +4,72 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dust2Cash — Agent Login</title>
+  <meta name="description" content="Agent login portal for Dust2Cash — secure access for agents." />
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="/static/css/ageng_login.css">
-
-  <!-- Font Awesome (for icons) -->
+  <!-- Font preload / preconnect for performance -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- JS -->
-  <script src="/static/js/agent_login.js" defer></script>
+  <!-- CSS: use STATIC_URL from context processor so no {% load static %} is required -->
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/agent_login.css">
 </head>
 <body>
-<div class="container" id="container">
-  <div class="form-container sign-in-container">
-    <form method="POST" action="/agent/login/">
-      {% csrf_token %}
-      <h1>Agent Login</h1>
-      <div class="social-container">
-        <a href="#" class="social"><i class="fas fa-shield-alt"></i></a>
-        <a href="#" class="social"><i class="fas fa-user-secret"></i></a>
-      </div>
-      <span>Use your agent credentials</span>
-      <label><input type="text" name="username" placeholder="Username" required /></label>
-      <label><input type="password" name="password" placeholder="Password" required /></label>
-      <a href="#">Forgot your password?</a>
-      <button type="submit">Sign In</button>
-    </form>
-  </div>
+  <a class="sr-only" href="#agent-form">Skip to sign in</a>
 
-  <div class="overlay-container">
-    <div class="overlay">
-      <div class="overlay-panel overlay-left">
-        <h1>Welcome Agent!</h1>
-        <p>Login to manage transactions and assist clients</p>
-      </div>
-      <div class="overlay-panel overlay-right">
-        <h1>Dust2Cash Portal</h1>
-        <p>Fast, fair, transparent crypto-to-cash conversions</p>
+  <div class="container" id="container">
+    <div class="form-container sign-in-container">
+      <form id="agent-form" method="POST" action="/agent/login/" novalidate>
+        {% csrf_token %}
+        <h1>Agent Login</h1>
+
+        <div class="social-container" aria-hidden="true">
+          <a href="#" class="social" aria-hidden="true"><i class="fas fa-shield-alt"></i></a>
+          <a href="#" class="social" aria-hidden="true"><i class="fas fa-user-secret"></i></a>
+        </div>
+
+        <p class="lead">Use your agent credentials</p>
+
+        <label for="id_username" class="visually-hidden">Username</label>
+        <input id="id_username" type="text" name="username" placeholder="Username" required autocomplete="username" />
+
+        <label for="id_password" class="visually-hidden">Password</label>
+        <div class="password-wrap">
+          <input id="id_password" type="password" name="password" placeholder="Password" required autocomplete="current-password" />
+          <!-- Toggle icon inserted by JS -->
+        </div>
+
+        <p class="muted">
+          <a href="#" class="forgot-link">Forgot your password?</a>
+        </p>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+
+        <div id="form-feedback" role="status" aria-live="polite" class="form-feedback" hidden></div>
+      </form>
+    </div>
+
+    <div class="overlay-container" aria-hidden="true">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h2>Welcome Agent!</h2>
+          <p>Login to manage transactions and assist clients</p>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h2>Dust2Cash Portal</h2>
+          <p>Fast, fair, transparent crypto-to-cash conversions</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<footer>
-  <div>
-    © {{ now.year|default:"2025" }} Dust2Cash ·
-    <span class="text-muted">Agent Portal — secure access</span>
-  </div>
-</footer>
+  <footer>
+    <div>
+      © {{ now.year|default:"2025" }} Dust2Cash ·
+      <span class="text-muted">Agent Portal — secure access</span>
+    </div>
+  </footer>
+
+  <!-- JS (defer) -->
+  <script src="{{ STATIC_URL }}js/agent_login.js" defer></script>
 </body>
 </html>
