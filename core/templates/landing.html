@@ -3,16 +3,25 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Dust2Cash — Fast, secure conversions and payouts. Turn your dust into cash with secure and fast payouts." />
   <title>Dust2Cash — Landing</title>
+
+  <!-- Performance: preconnect for Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Load font in the head (better than @import in CSS for performance) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
   <!-- Styles (no {% load static %}; STATIC_URL must be provided by context processor) -->
   <link rel="stylesheet" href="{{ STATIC_URL }}css/landing.css">
 </head>
 <body>
-  <header class="site-header">
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <header class="site-header" role="banner">
     <div class="container">
       <h1 class="brand">Dust2Cash</h1>
-      <nav class="main-nav">
+      <nav class="main-nav" role="navigation" aria-label="Primary navigation">
         <a href="/">Home</a>
         <a href="/about/">About</a>
         <a href="/login/">Log in</a>
@@ -20,11 +29,12 @@
     </div>
   </header>
 
-  <main id="main" class="container">
+  <main id="main" class="container" role="main">
     <section class="hero" role="region" aria-label="hero">
       <h2>Turn your dust into cash</h2>
       <p>Fast, secure conversions and payouts. Join for free and start converting today.</p>
-      <p><a class="cta" href="/signup/">Get started</a></p>
+      <!-- Give the CTA an id so landing.js can find it (or use data-signup) -->
+      <p><a id="signUp" class="cta" href="/signup/">Get started</a></p>
     </section>
 
     <section class="features" role="region" aria-label="features">
@@ -39,13 +49,13 @@
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="container">
       <small>© {{ now.year }} Dust2Cash</small>
     </div>
   </footer>
 
-  <!-- Load script with defer to avoid DOM timing issues; static/js/landing.js should wrap any DOM access in DOMContentLoaded as well -->
+  <!-- Load script with defer to avoid DOM timing issues; static/js/landing.js already guards with DOMContentLoaded -->
   <script src="{{ STATIC_URL }}js/landing.js" defer></script>
 </body>
 </html>
