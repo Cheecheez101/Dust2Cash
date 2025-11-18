@@ -19,6 +19,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # enable static serving in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -38,6 +39,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',     # <-- make STATIC_URL available in templates
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.dust2cash_settings',
@@ -67,21 +69,16 @@ TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
 USE_TZ = True
 
+# Static / Media
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'           # collectstatic target
+STATICFILES_DIRS = [BASE_DIR / 'static']         # find app-level static/ during collectstatic
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-
-
-# Required for production (Render, Heroku, etc.)
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email config (update for real SMTP later)
+# Email config (console for dev)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
