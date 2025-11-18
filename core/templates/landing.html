@@ -3,134 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dust2Cash — your dust, your cash</title>
+  <title>Dust2Cash — Landing</title>
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/css/main.css" rel="stylesheet">
-
-  <meta name="description" content="Convert small crypto balances into mobile money — simple, fair and transparent.">
-  <link rel="icon" href="/static/favicon.png">
+  <!-- Styles (no {% load static %}; STATIC_URL must be provided by context processor) -->
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/landing.css">
 </head>
-<body class="bg-light">
-
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
-      <span class="brand-title">Dust2Cash</span>
-    </a>
-
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark" href="/login">Login</a>
-      <a class="btn btn-gold" href="/login">Get Started</a>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1 class="brand">Dust2Cash</h1>
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/login/">Log in</a>
+      </nav>
     </div>
-  </div>
-</nav>
+  </header>
 
-<header class="py-5">
-  <div class="container">
-    <div class="row align-items-center gy-4">
-      <div class="col-lg-7">
-        <h1 class="display-5 fw-bold">Dust2Cash — your dust, your cash</h1>
-        <p class="lead">
-          Convert small crypto balances (even 5 USDT) into M-Pesa or Airtel Money — fast, fair, and transparent.
-          Transaction fee included. <strong>No hidden charges.</strong>
-        </p>
+  <main id="main" class="container">
+    <section class="hero" role="region" aria-label="hero">
+      <h2>Turn your dust into cash</h2>
+      <p>Fast, secure conversions and payouts. Join for free and start converting today.</p>
+      <p><a class="cta" href="/signup/">Get started</a></p>
+    </section>
 
-        <div class="mt-4">
-          <a class="btn btn-gold btn-lg me-2" href="/client/login">Create Account</a>
-          <a class="btn btn-outline-secondary btn-lg" href="#how-it-works">How it works</a>
-        </div>
+    <section class="features" role="region" aria-label="features">
+      <article class="feature">
+        <h3>Secure</h3>
+        <p>We use modern encryption and best practices to protect your data.</p>
+      </article>
+      <article class="feature">
+        <h3>Fast payouts</h3>
+        <p>Payouts processed within 24 hours.</p>
+      </article>
+    </section>
+  </main>
 
-        <ul class="list-unstyled mt-5 small text-muted">
-          <li><strong>Platform friendly:</strong> Binance → Binance, Bybit → Bybit — no cross-platform fees.</li>
-          <li><strong>Multiple payouts:</strong> M-Pesa & Airtel Money supported.</li>
-          <li><strong>Transparent:</strong> Slogan — “Dust2Cash, your dust your cash, with clear transaction cost.”</li>
-        </ul>
-      </div>
-
-      <div class="col-lg-5">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h5 class="card-title">Quick rate snapshot</h5>
-            <p class="mb-1">1 USDT = <span class="fs-5 fw-semibold">KSH {{ settings.buying_rate_per_usdt|default:"100.00" }}</span></p>
-            <p class="mb-1">Transaction fee: <strong>{{ settings.transaction_fee_percent|default:"1.50" }}%</strong></p>
-            <p class="mb-0">Min trade: <strong>{{ settings.min_trade_amount_usdt|default:"5.00" }} USDT</strong></p>
-            <hr>
-            <p class="mb-0 small text-muted">Before transferring, ensure an <strong>Agent is online</strong>. If none are online, request assistance — you'll be notified when an Agent becomes active.</p>
-          </div>
-        </div>
-
-        <div class="mt-3 small text-muted">
-          <p class="mb-0"><strong>Supported platforms:</strong> Binance, Bybit, Bitget</p>
-          <p class="mb-0"><strong>Supported currencies:</strong> USDT, WorldCoin</p>
-        </div>
-      </div>
+  <footer class="site-footer">
+    <div class="container">
+      <small>© {{ now.year }} Dust2Cash</small>
     </div>
-  </div>
-</header>
+  </footer>
 
-<section id="how-it-works" class="py-5">
-  <div class="container">
-    <h2 class="h3">How it works — simple steps</h2>
-    <div class="row text-muted mt-4">
-      <div class="col-md-4">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">1. Sign up & verify</h5>
-            <p class="card-text">Create an account using email or Google. Verify your email with a 6-digit code so your profile can transact.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 mt-3 mt-md-0">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">2. Confirm an Agent</h5>
-            <p class="card-text">Before sending funds confirm an Agent is online. If none are available, request assistance — Agents get notified by email.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 mt-3 mt-md-0">
-        <div class="card h-100 border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">3. Send crypto & receive mobile money</h5>
-            <p class="card-text">Choose platform, currency, and amount. Send crypto to the provided address/QR. When Agent confirms receipt, we pay out to your M-Pesa or Airtel Money.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="py-5 bg-white border-top">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8">
-        <h3 class="h5">Why customers choose Dust2Cash</h3>
-        <ul>
-          <li>Works with tiny balances (no minimum barrier beyond typical exchange limits).</li>
-          <li>Same-platform transfers avoid exchange withdrawal fees.</li>
-          <li>Transparent fee shown up front — "transaction fee included".</li>
-        </ul>
-      </div>
-      <div class="col-md-4 text-md-end mt-3 mt-md-0">
-        <p class="mb-1 small text-muted">Need support? <a href="mailto:support@dust2cash.example">support@dust2cash.example</a></p>
-        <p class="small text-muted">Follow us: <a href="#" class="text-decoration-none">Instagram</a> · <a href="#" class="text-decoration-none">Facebook</a></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer class="py-4 bg-light">
-  <div class="container text-center small text-muted">
-    © {{ now.year|default:"2025" }} Dust2Cash · <span class="text-muted">Your dust, your cash — clear transaction cost</span>
-  </div>
-</footer>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Load script with defer to avoid DOM timing issues; static/js/landing.js should wrap any DOM access in DOMContentLoaded as well -->
+  <script src="{{ STATIC_URL }}js/landing.js" defer></script>
 </body>
 </html>
