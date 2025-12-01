@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Dust2Cash - Convert your cryptocurrency dust into Kenyan Shillings with fast, secure M-Pesa payouts.">
+    <title>{{ page_title|default:"Dust2Cash" }}</title>
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'landing/styles.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">Dust2Cash</a>
+                <nav class="nav" aria-label="Main navigation">
+                    <a href="{% url 'landing' %}">Home</a>
+                    <!-- TODO: Add About page link when available -->
+                    <a href="{% url 'login' %}">Log In</a>
+                    <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main id="main">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>Turn Your Crypto Dust Into Cash</h1>
+                <p class="hero-subtitle">
+                    Convert small cryptocurrency amounts into Kenyan Shillings 
+                    with fast, secure M-Pesa payouts.
+                </p>
+                <div class="hero-cta">
+                    <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Get Started Free</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline btn-lg">Log In</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2>Why Choose Dust2Cash?</h2>
+                <div class="features-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure Transactions</h3>
+                        <p>
+                            Your funds are protected with industry-standard encryption 
+                            and secure payment processing.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Fast Payouts</h3>
+                        <p>
+                            Receive your money directly to M-Pesa within minutes, 
+                            not days.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>Best Rates</h3>
+                        <p>
+                            Competitive exchange rates with transparent fees. 
+                            No hidden charges.
+                        </p>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Made for Kenya</h3>
+                        <p>
+                            Built specifically for Kenyan users with local payment 
+                            methods and support.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works">
+            <div class="container">
+                <h2>How It Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Create Account</h3>
+                        <p>Sign up for free and complete your profile with your M-Pesa details.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Start Transaction</h3>
+                        <p>Enter the amount of crypto you want to convert and confirm the rate.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Send Crypto</h3>
+                        <p>Transfer your cryptocurrency to the provided wallet address.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Get Paid</h3>
+                        <p>Receive KSH directly to your M-Pesa once confirmed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Convert Your Crypto?</h2>
+                <p>Join thousands of Kenyans who trust Dust2Cash for their crypto conversions.</p>
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-lg">Sign Up Now</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo">Dust2Cash</span>
+                    <p>Fast, secure crypto to cash conversions for Kenya.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{% url 'landing' %}">Home</a></li>
+                        <li><a href="{% url 'login' %}">Log In</a></li>
+                        <li><a href="{% url 'signup' %}">Sign Up</a></li>
+                        <!-- TODO: Add links to About, Terms, Privacy pages -->
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact</h4>
+                    <p>
+                        <!-- TODO: Add real contact information -->
+                        Email: support@dust2cash.com
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Dust2Cash. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

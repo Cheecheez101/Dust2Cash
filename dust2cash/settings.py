@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'landing',
 ]
 
 # Detect whether whitenoise is installed so we can fail gracefully during builds
