@@ -14,8 +14,9 @@ from .decorators import agent_required, client_required
 
 
 def landing(request):
-    return render(request, 'landing.html')
-
+       return render(request, 'landing/index.html', {
+           'page_title': 'Dust2Cash - Convert Crypto to Cash',
+       })
 
 def login_view(request):
     if request.user.is_authenticated:
