@@ -331,7 +331,7 @@ ol {
 	font-size: 16px;
 	padding: 10px 5px;
 	margin-right: 30px;
-	color: #fff;
+	color: #1a7af6;
 }
 
 /*---------------------
@@ -1817,4 +1817,62 @@ ol {
 	.comment .comment-content {
 		padding-left: 0;
 	}
+}
+/* css */
+/* Appended fixes: make navbar content blue and visible */
+.header-section {
+  background: #fff;                     /* ensure contrast */
+  z-index: 1000001 !important;          /* sit above preloader */
+  position: relative;
+}
+
+/* Force menu visible and links blue */
+.main-menu,
+.menu-list {
+  display: flex !important;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-list li a {
+  color: #1a7af6 !important;            /* blue links */
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 6px;
+  background: transparent !important;
+  text-shadow: none;
+}
+
+/* Visible header controls (user icon / sign-up / burger) */
+.header-section .user,
+.header-section .site-btn,
+.header-section .responsive-bar {
+  display: inline-flex !important;
+  align-items: center;
+}
+
+/* Mobile: show drop-down menu with blue links */
+@media (max-width: 767px) {
+  .main-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0;
+    width: 100%;
+    background: #fff !important;
+    box-shadow: 0 14px 43px rgba(33,54,61,0.15);
+    display: block !important;
+    padding: 8px 16px;
+  }
+  .menu-list {
+    display: block !important;
+  }
+  .menu-list li {
+    display: block;
+    border-top: 1px solid #eaeaea;
+  }
+  .menu-list li a {
+    display: block;
+    padding: 12px 8px;
+    color: #1a7af6 !important;
+  }
 }

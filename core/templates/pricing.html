@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Pricing — Dust2Cash{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Pricing</h2>
+    <div class="site-beradcamb">
+      <a href="/">Home</a>
+      <span><i class="fa fa-angle-right"></i> Pricing</span>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>Transparent pricing</h2>
+      <p>Pick the plan that suits your volume.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+          <h5>Standard</h5>
+          <p class="h2 mb-3">1.5% <small>per conversion</small></p>
+          <ul class="list-unstyled text-muted mb-4">
+            <li>Up to $10K dust per month</li>
+            <li>Email + chat support</li>
+            <li>Same-day payouts</li>
+          </ul>
+          <a href="/signup/" class="site-btn sb-gradients">Start now</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 text-center border-primary h-100">
+          <h5>Pro</h5>
+          <p class="h2 mb-3">0.9% <small>per conversion</small></p>
+          <ul class="list-unstyled text-muted mb-4">
+            <li>Up to $100K dust per month</li>
+            <li>Dedicated success manager</li>
+            <li>Priority wire payouts</li>
+          </ul>
+          <a href="/signup/" class="site-btn sb-gradients">Get Pro</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

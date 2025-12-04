@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Transactions — Admin Console{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Transactions</h2>
+    <div class="site-beradcamb">
+      <a href="/console/">Admin</a>
+      <span><i class="fa fa-angle-right"></i> Transactions</span>
+    </div>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="table-responsive shadow-sm">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client</th>
+            <th>Agent</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in transactions %}
+          <tr>
+            <td>#{{ tx.id }}</td>
+            <td>{{ tx.client }}</td>
+            <td>{{ tx.agent }}</td>
+            <td>{{ tx.amount }} {{ tx.get_currency_display }}</td>
+            <td><span class="badge bg-light text-dark">{{ tx.get_status_display }}</span></td>
+            <td>{{ tx.created_at|date:'M d, Y H:i' }}</td>
+            <td class="text-end">
+              <a class="btn btn-outline-secondary btn-sm" href="/console/transactions/{{ tx.pk }}/edit/">Edit</a>
+              <a class="btn btn-outline-danger btn-sm" href="/console/transactions/{{ tx.pk }}/delete/">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-4">No transactions found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

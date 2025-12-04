@@ -1,61 +1,217 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Dust2Cash — Fast, secure conversions and payouts. Turn your dust into cash with secure and fast payouts." />
-  <title>Dust2Cash — Landing</title>
-
-  <!-- Performance: preconnect for Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Load font in the head (better than @import in CSS for performance) -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <!-- Styles (no {% load static %}; STATIC_URL must be provided by context processor) -->
-  <link rel="stylesheet" href="{{ STATIC_URL }}css/main.css">
-</head>
-<body>
-  <a class="sr-only" href="#main">Skip to content</a>
-
-  <header class="site-header" role="banner">
-    <div class="container">
-      <h1 class="brand">Dust2Cash</h1>
-      <nav class="main-nav" role="navigation" aria-label="Primary navigation">
-        <a href="/">Home</a>
-        <a href="/about/">About</a>
-        <a href="/login/">Log in</a>
-      </nav>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dust2Cash — Turn dust into payouts{% endblock %}
+{% block content %}
+<!-- Hero section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 hero-text order-2 order-lg-1">
+        <h2>Turn your crypto <span>dust</span> into real payouts</h2>
+        <h4>Automatically aggregate small balances and receive instant payouts to bank or stablecoin.</h4>
+        <form class="hero-subscribe-from" action="/signup/" method="get">
+          <input type="email" name="email" placeholder="Enter your email" aria-label="Email" required>
+          <button type="submit" class="btn btn-gradient">Get Started</button>
+        </form>
+        <ul class="hero-benefits list-unstyled mt-3 d-flex flex-column gap-2">
+          <li><i class="fa fa-check text-success"></i> Low, transparent fees</li>
+          <li><i class="fa fa-check text-success"></i> Secure, audited flows</li>
+          <li><i class="fa fa-check text-success"></i> Same-day payouts</li>
+        </ul>
+      </div>
+      <div class="col-lg-6 text-center order-1 order-lg-2">
+        <img src="{% static 'img/laptop.png' %}" class="laptop-image hero-visual img-fluid" alt="Dust2Cash dashboard">
+      </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <main id="main" class="container" role="main">
-    <section class="hero" role="region" aria-label="hero">
-      <h2>Turn your dust into cash</h2>
-      <p>Fast, secure conversions and payouts. Join for free and start converting today.</p>
-      <!-- Give the CTA an id so landing.js can find it (or use data-signup) -->
-      <p><a id="signUp" class="cta" href="/signup/">Get started</a></p>
-    </section>
-
-    <section class="features" role="region" aria-label="features">
-      <article class="feature">
-        <h3>Secure</h3>
-        <p>We use modern encryption and best practices to protect your data.</p>
-      </article>
-      <article class="feature">
-        <h3>Fast payouts</h3>
-        <p>Payouts processed within 24 hours.</p>
-      </article>
-    </section>
-  </main>
-
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <small>© {{ now.year }} Dust2Cash</small>
+<!-- About section -->
+<section id="about" class="about-section spad">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-5">
+        <div class="about-media text-center text-lg-start">
+          <img src="{% static 'img/laptop.png' %}" class="img-fluid" alt="Dust2Cash platform screen">
+        </div>
+      </div>
+      <div class="col-lg-7 about-text">
+        <h2>What is Dust2Cash</h2>
+        <h5>Dust2Cash is an innovative platform to convert small crypto balances into instant payouts.</h5>
+        <p>Crypto dust refers to tiny amounts of cryptocurrency left in wallets that are too small to transact profitably. Dust2Cash aggregates these balances, converts them efficiently, and pays you out in fiat or stablecoins. It's the dawn of hassle-free crypto management.</p>
+        <div class="about-list">
+          <p><i class="fa fa-circle-check"></i> SOC 2 aligned custody workflows</p>
+          <p><i class="fa fa-circle-check"></i> Multi-chain support with real-time FX quotes</p>
+          <p><i class="fa fa-circle-check"></i> Instant reconciliation dashboard</p>
+        </div>
+        <a href="/signup/" class="site-btn sb-gradients sbg-line mt-4">Get Started</a>
+      </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <!-- Load script with defer to avoid DOM timing issues; static/js/landing.js already guards with DOMContentLoaded -->
-  <script src="{{ STATIC_URL }}js/landing.js" defer></script>
-</body>
-</html>
+<!-- How it works (process) -->
+<section id="how-it-works" class="process-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>How Dust2Cash works</h2>
+      <p>Three simple steps to reclaim value from leftover balances.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/1.png' %}" alt="connect">
+          </figure>
+          <h4>Connect wallets</h4>
+          <p>Securely connect or import balances from multiple addresses.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/2.png' %}" alt="select">
+          </figure>
+          <h4>Select tokens</h4>
+          <p>Pick which small-balance tokens to aggregate and convert.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/3.png' %}" alt="withdraw">
+          </figure>
+          <h4>Convert & withdraw</h4>
+          <p>Approve conversion and receive payout to your chosen destination.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fact section -->
+<section class="fact-section gradient-bg">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="fact">
+          <h2>50+</h2>
+          <p>Supported <br> Tokens</p>
+          <i class="fa fa-coins"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="fact">
+          <h2>10K+</h2>
+          <p>Transactions <br> Processed</p>
+          <i class="fa fa-exchange-alt"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="fact">
+          <h2>$1M+</h2>
+          <p>Dust <br> Converted</p>
+          <i class="fa fa-dollar-sign"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-lg-3">
+        <div class="fact">
+          <h2>99.9%</h2>
+          <p>Uptime <br> Guarantee</p>
+          <i class="fa fa-shield-alt"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="features-section spad gradient-bg">
+  <div class="container text-white">
+    <div class="section-title text-center">
+      <h2>Our Features</h2>
+      <p>Dust2Cash is the simplest way to exchange dust for cash at very low cost.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-shield"></i>
+        <h4>Secure</h4>
+        <p>Minimal data collection, encrypted processing and audit logs.</p>
+      </div>
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-bolt"></i>
+        <h4>Fast payouts</h4>
+        <p>Same-day processing available for most destinations.</p>
+      </div>
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-percent"></i>
+        <h4>Clear fees</h4>
+        <p>One flat fee per conversion — no hidden charges.</p>
+      </div>
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-wallet"></i>
+        <h4>Multi-wallet</h4>
+        <p>Support for multiple wallets and addresses in one account.</p>
+      </div>
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-headset"></i>
+        <h4>24/7 Support</h4>
+        <p>Expert support available anytime for your queries.</p>
+      </div>
+      <div class="col-md-6 col-lg-4 feature text-center">
+        <i class="fa fa-sync"></i>
+        <h4>Auto-convert</h4>
+        <p>Set up automatic conversions for recurring dust accumulation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="pricing-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>Transparent pricing</h2>
+      <p>Pick the plan that suits your volume.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="card p-4 text-center">
+          <h5>Standard</h5>
+          <p class="h2">1.5% <small>per conversion</small></p>
+          <a href="/signup/" class="site-btn sb-gradients">Start now</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 text-center">
+          <h5>Pro</h5>
+          <p class="h2">0.9% <small>per conversion</small></p>
+          <a href="/signup/" class="site-btn sb-gradients">Get Pro</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter section -->
+<section class="newsletter-section gradient-bg">
+  <div class="container text-white">
+    <div class="row gy-4 align-items-center">
+      <div class="col-lg-7 newsletter-text">
+        <h2>Subscribe to our Newsletter</h2>
+        <p>Sign up for our weekly crypto updates, dust conversion tips, and market analysis.</p>
+      </div>
+      <div class="col-lg-5 col-md-8 offset-lg-0 offset-md-2">
+        <form class="newsletter-form" action="/newsletter/" method="post">
+          <input type="email" name="email" placeholder="Enter your email">
+          <button>Get Started</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}How Dust2Cash Works{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>How Dust2Cash Works</h2>
+    <div class="site-beradcamb">
+      <a href="/">Home</a>
+      <span><i class="fa fa-angle-right"></i> How it works</span>
+    </div>
+  </div>
+</section>
+
+<section class="hero-section" id="overview">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6 hero-text">
+        <h2>Turn leftover <span>dust</span> into real payouts</h2>
+        <h4>We follow the exact three-step flow from the landing page, but expand on each stage so teams know what to expect.</h4>
+        <ul class="list-unstyled mt-4 d-flex flex-column gap-2">
+          <li><i class="fa fa-check text-success"></i> SOC 2 aligned custody workflows</li>
+          <li><i class="fa fa-check text-success"></i> Real-time FX quotes and fee transparency</li>
+          <li><i class="fa fa-check text-success"></i> Same-day payouts to bank, mobile money, or stablecoin</li>
+        </ul>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="{% static 'img/laptop.png' %}" class="laptop-image hero-visual img-fluid" alt="Dust2Cash dashboard">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="process-section spad" id="how-it-works">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>Three simple steps</h2>
+      <p>Identical to the landing page flow: connect wallets, pick dust, convert and withdraw.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/1.png' %}" alt="Connect">
+          </figure>
+          <h4>1. Connect wallets</h4>
+          <p>Securely connect or import any wallet, exchange, or custody account holding small token balances.</p>
+        </div>
+      </div>
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/2.png' %}" alt="Select">
+          </figure>
+          <h4>2. Select tokens</h4>
+          <p>Pick which dust positions to aggregate, preview quotes, and see the payout estimate instantly.</p>
+        </div>
+      </div>
+      <div class="col-md-4 process">
+        <div class="process-step text-center">
+          <figure class="process-icon">
+            <img src="{% static 'img/process-icons/3.png' %}" alt="Withdraw">
+          </figure>
+          <h4>3. Convert & withdraw</h4>
+          <p>Approve the conversion and receive payouts directly to your preferred destination the same day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="fact-section gradient-bg">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-sm-6 col-lg-3">
+        <div class="fact">
+          <h2>50+</h2>
+          <p>Supported<br>Tokens</p>
+          <i class="fa fa-coins"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="fact">
+          <h2>10K+</h2>
+          <p>Transactions<br>Processed</p>
+          <i class="fa fa-exchange-alt"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="fact">
+          <h2>$1M+</h2>
+          <p>Dust<br>Converted</p>
+          <i class="fa fa-dollar-sign"></i>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="fact">
+          <h2>99.9%</h2>
+          <p>Uptime<br>Guarantee</p>
+          <i class="fa fa-shield-alt"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>Why the process works</h2>
+      <p>Borrowed from the landing features block so visitors see the same advantages.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-shield"></i>
+        <h4>Secure</h4>
+        <p>Minimal data capture, encrypted processing, and full audit logs so you stay compliant.</p>
+      </div>
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-bolt"></i>
+        <h4>Fast payouts</h4>
+        <p>Same-day processing for most payout rails, matched to the hero promise.</p>
+      </div>
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-percent"></i>
+        <h4>Clear fees</h4>
+        <p>Exactly the copy from the landing card—flat fees and no surprises.</p>
+      </div>
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-wallet"></i>
+        <h4>Multi-wallet support</h4>
+        <p>Aggregate dust from multiple wallets and exchanges in a single workflow.</p>
+      </div>
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-headset"></i>
+        <h4>24/7 Support</h4>
+        <p>On-call agents mirror the landing checklist so users know help is available.</p>
+      </div>
+      <div class="col-md-4 feature text-center">
+        <i class="fa fa-sync"></i>
+        <h4>Automation</h4>
+        <p>Set auto-convert rules for recurring dust accumulation; same promise as the main page.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <h2>Transparent pricing</h2>
+      <p>Embedded here so visitors following the how-it-works path still see plans.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+          <h5>Standard</h5>
+          <p class="h2">1.5% <small>per conversion</small></p>
+          <a href="/signup/" class="site-btn sb-gradients">Start now</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-4 text-center h-100">
+          <h5>Pro</h5>
+          <p class="h2">0.9% <small>per conversion</small></p>
+          <a href="/signup/" class="site-btn sb-gradients">Get Pro</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="newsletter-section gradient-bg">
+  <div class="container text-white">
+    <div class="row gy-4 align-items-center">
+      <div class="col-lg-7 newsletter-text">
+        <h2>Stay current on the workflow</h2>
+        <p>Same CTA as the landing page newsletter so messaging stays consistent.</p>
+      </div>
+      <div class="col-lg-5 col-md-8 offset-lg-0 offset-md-2">
+        <form class="newsletter-form" action="/newsletter/" method="post">
+          <input type="email" name="email" placeholder="Enter your email">
+          <button>Get Started</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

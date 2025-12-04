@@ -7,8 +7,15 @@ from django.core.mail import send_mail
 from django.conf import settings
 from datetime import timedelta
 from decimal import Decimal
+import csv
+from django.http import HttpResponse, Http404, JsonResponse
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.models import User
 
-from .models import ClientProfile, AgentProfile, Transaction, AgentRequest
+from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile
 from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm
 from .decorators import agent_required, client_required
 
@@ -17,23 +24,56 @@ def landing(request):
     return render(request, 'landing.html')
 
 
+def about_page(request):
+    return render(request, 'about.html')
+
+
+def contact_page(request):
+    return render(request, 'contact.html')
+
+
+def pricing_page(request):
+    return render(request, 'pricing.html')
+
+
+def how_it_works_page(request):
+    return render(request, 'how_it_works.html')
+
+
+def features_page(request):
+    return render(request, 'features.html')
+
+
+def redirect_user_by_role(user):
+    if user.is_staff:
+        return redirect('admin_dashboard')
+    if hasattr(user, 'agent_profile'):
+        return redirect('agent_portal')
+    if hasattr(user, 'client_profile'):
+        return redirect('client_dashboard')
+    return redirect('landing')
+
+
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('client_dashboard')
-    
+        return redirect_user_by_role(request.user)
+
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data['email']
+        identifier = form.cleaned_data['identifier']
         password = form.cleaned_data['password']
-        
         try:
-            from django.contrib.auth.models import User
-            user = User.objects.get(email=email)
+            if '@' in identifier:
+                user = User.objects.get(email=identifier)
+            else:
+                user = User.objects.get(username=identifier)
             user = authenticate(request, username=user.username, password=password)
             if user:
                 login(request, user)
                 messages.success(request, 'Welcome back!')
-                return redirect('client_dashboard')
+                if user.is_staff:
+                    AdminProfile.objects.get_or_create(user=user)
+                return redirect_user_by_role(user)
             else:
                 messages.error(request, 'Invalid credentials')
         except User.DoesNotExist:
@@ -44,8 +84,8 @@ def login_view(request):
 
 def signup_view(request):
     if request.user.is_authenticated:
-        return redirect('client_dashboard')
-    
+        return redirect_user_by_role(request.user)
+
     form = SignUpForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         user = form.save()
@@ -56,7 +96,9 @@ def signup_view(request):
             last_name=form.cleaned_data['last_name'],
             email=form.cleaned_data['email'],
         )
-        
+        if user.is_staff:
+            AdminProfile.objects.get_or_create(user=user)
+
         login(request, user)
         messages.success(request, 'Account created successfully! Please complete your profile.')
         return redirect('client_profile')
@@ -178,22 +220,6 @@ def request_address(request, transaction_id):
         return redirect('client_dashboard')
     
     return render(request, 'client/request_address.html', {'transaction': transaction})
-
-
-def agent_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None and hasattr(user, 'agent_profile'):
-            login(request, user)
-            return redirect('agent_portal')
-        else:
-            messages.error(request, 'Invalid credentials or not an agent.')
-            return redirect('agent_login')
-
-    return render(request, 'agent/login.html')
 
 
 @agent_required
@@ -456,3 +482,181 @@ Dust2Cash Team
             )
         except Exception as e:
             print(f"Error sending email: {e}")
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminDashboardView(TemplateView):
+    template_name = 'admin/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'client_count': ClientProfile.objects.count(),
+            'agent_count': AgentProfile.objects.count(),
+            'transaction_count': Transaction.objects.count(),
+            'reports_count': Transaction.objects.count(),
+        })
+        return context
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminClientListView(ListView):
+    model = ClientProfile
+    template_name = 'admin/clients_list.html'
+    context_object_name = 'clients'
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminClientCreateView(CreateView):
+    model = ClientProfile
+    fields = ['first_name', 'last_name', 'phone_number', 'email']
+    template_name = 'admin/client_form.html'
+    success_url = reverse_lazy('admin_clients')
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        base_username = email.split('@')[0]
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=User.objects.make_random_password()
+        )
+        form.instance.user = user
+        return super().form_valid(form)
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminClientUpdateView(UpdateView):
+    model = ClientProfile
+    fields = ['first_name', 'last_name', 'phone_number', 'email']
+    template_name = 'admin/client_form.html'
+    success_url = reverse_lazy('admin_clients')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = self.object.user
+        if user:
+            user.email = self.object.email
+            user.save(update_fields=['email'])
+        return response
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminClientDeleteView(DeleteView):
+    model = ClientProfile
+    template_name = 'admin/client_confirm_delete.html'
+    success_url = reverse_lazy('admin_clients')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        user = self.object.user
+        response = super().delete(request, *args, **kwargs)
+        if user:
+            user.delete()
+        return response
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentListView(ListView):
+    model = AgentProfile
+    template_name = 'admin/agents_list.html'
+    context_object_name = 'agents'
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentCreateView(CreateView):
+    model = AgentProfile
+    fields = ['user', 'is_online']
+    template_name = 'admin/agent_form.html'
+    success_url = reverse_lazy('admin_agents')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['user'].queryset = User.objects.filter(agent_profile__isnull=True)
+        return form
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentUpdateView(UpdateView):
+    model = AgentProfile
+    fields = ['is_online']
+    template_name = 'admin/agent_form.html'
+    success_url = reverse_lazy('admin_agents')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['is_online'].label = 'Currently online'
+        return form
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentDeleteView(DeleteView):
+    model = AgentProfile
+    template_name = 'admin/agent_confirm_delete.html'
+    success_url = reverse_lazy('admin_agents')
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminTransactionListView(ListView):
+    model = Transaction
+    template_name = 'admin/transactions_list.html'
+    context_object_name = 'transactions'
+    ordering = ['-created_at']
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminTransactionUpdateView(UpdateView):
+    model = Transaction
+    fields = ['status', 'exchange_rate', 'transaction_fee', 'amount_to_receive']
+    template_name = 'admin/transaction_form.html'
+    success_url = reverse_lazy('admin_transactions')
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminTransactionDeleteView(DeleteView):
+    model = Transaction
+    template_name = 'admin/transaction_confirm_delete.html'
+    success_url = reverse_lazy('admin_transactions')
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminReportsView(TemplateView):
+    template_name = 'admin/reports.html'
+
+
+@staff_member_required
+def export_clients_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="clients.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['First Name', 'Last Name', 'Email', 'Phone', 'Created'])
+    for client in ClientProfile.objects.all():
+        writer.writerow([client.first_name, client.last_name, client.email, client.phone_number, client.created_at])
+    return response
+
+
+@staff_member_required
+def export_agents_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="agents.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Username', 'Email', 'Online', 'Last Online'])
+    for agent in AgentProfile.objects.select_related('user'):
+        writer.writerow([agent.user.username, agent.user.email, agent.is_online, agent.last_online])
+    return response
+
+
+@staff_member_required
+def export_transactions_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="transactions.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Client', 'Agent', 'Amount', 'Currency', 'Status', 'Created'])
+    for tx in Transaction.objects.select_related('client', 'agent'):
+        writer.writerow([tx.id, str(tx.client), str(tx.agent) if tx.agent else '', tx.amount, tx.get_currency_display(), tx.get_status_display(), tx.created_at])
+    return response

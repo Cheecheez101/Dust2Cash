@@ -1,383 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>Cryptocurrency - Landing Page Template</title>
-	<meta charset="UTF-8">
-	<meta name="description" content="Cryptocurrency Landing Page Template">
-	<meta name="keywords" content="cryptocurrency, unica, creative, html">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Favicon -->
-	<link href="img/favicon.ico" rel="shortcut icon"/>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}About Dust2Cash{% endblock %}
+{% block content %}
+<section class="page-info-section page-info-admin">
+  <div class="container">
+    <div class="site-beradcamb">
+      <a href="/">Home</a>
+      <span><i class="fa fa-angle-right"></i> About</span>
+    </div>
+    <h2 class="mt-2">We turn forgotten crypto into everyday cash</h2>
+    <p class="text-light opacity-75 mb-0">Dust2Cash is on a mission to unlock stranded balances for individuals, creators, and businesses across Africa.</p>
+  </div>
+</section>
 
-	<!-- Google Fonts -->
-	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+<section class="about-section spad">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-6 order-2 order-lg-1">
+        <h5 class="text-uppercase text-primary fw-bold">Our story</h5>
+        <h2>Solving the "dust" problem for everyday crypto users</h2>
+        <p>Scattered fractions of coins accumulate on exchanges, wallets, and DeFi rails, yet most people have no practical way to unlock them. Dust2Cash aggregates these balances securely, converts them at institutional FX rates, then delivers instant payouts to bank accounts or mobile money.</p>
+        <p>We are headquartered in Nairobi with partners in Lagos, Kampala, and Johannesburg. Our in-house ops team runs 24/7 to keep conversions fast, compliant, and human-friendly.</p>
+        <div class="about-list">
+          <p><i class="fa fa-circle-check"></i> PCI-DSS aligned payment operations</p>
+          <p><i class="fa fa-circle-check"></i> Realtime liquidity for USDT, USDC, BTC, ETH, WLD</p>
+          <p><i class="fa fa-circle-check"></i> Instant payouts to M-Pesa, Airtel Money, bank rails</p>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center order-1 order-lg-2">
+        <img src="{% static 'img/laptop.png' %}" class="img-fluid shadow-lg rounded" alt="Dust2Cash operations dashboard">
+      </div>
+    </div>
+  </div>
+</section>
 
-	<!-- Stylesheets -->
-	<link rel="stylesheet" href="css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="css/font-awesome.min.css"/>
-	<link rel="stylesheet" href="css/themify-icons.css"/>
-	<link rel="stylesheet" href="css/owl.carousel.css"/>
-	<link rel="stylesheet" href="css/style.css"/>
+<section class="fact-section gradient-bg">
+  <div class="container">
+    <div class="row g-4 text-center">
+      <div class="col-6 col-lg-3">
+        <div class="fact">
+          <h2>5K+</h2>
+          <p>Active <br> customers</p>
+          <i class="fa fa-users"></i>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="fact">
+          <h2>$12M</h2>
+          <p>Total <br> dust converted</p>
+          <i class="fa fa-coins"></i>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="fact">
+          <h2>15</h2>
+          <p>Markets <br> supported</p>
+          <i class="fa fa-globe"></i>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="fact">
+          <h2>99.95%</h2>
+          <p>Uptime <br> for payouts</p>
+          <i class="fa fa-shield"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
+<section class="team-section spad">
+  <div class="container">
+    <div class="section-title text-center">
+      <p class="section-kicker">Leadership</p>
+      <h2>Operators powering Dust2Cash</h2>
+      <p>Operators, compliance experts, and payment engineers dedicated to making conversions seamless.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-sm-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="{% static 'img/member/1.jpg' %}" alt="Lisa Karanja portrait">
+          </div>
+          <div class="team-content">
+            <h5>Lisa Karanja</h5>
+            <span>CEO &amp; Co-founder</span>
+            <p>Former head of payments at a tier-one fintech, Lisa leads strategy and partnerships across Africa.</p>
+            <div class="team-social">
+              <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="{% static 'img/member/2.jpg' %}" alt="Rashid Opiyo portrait">
+          </div>
+          <div class="team-content">
+            <h5>Rashid Opiyo</h5>
+            <span>COO</span>
+            <p>Rashid oversees daily liquidity, agent coordination, and compliance operations.</p>
+            <div class="team-social">
+              <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="{% static 'img/member/3.jpg' %}" alt="Naliaka Mwangi portrait">
+          </div>
+          <div class="team-content">
+            <h5>Naliaka Mwangi</h5>
+            <span>CTO</span>
+            <p>Naliaka is responsible for the Dust2Cash conversion engine, security, and data platform.</p>
+            <div class="team-social">
+              <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-	<![endif]-->
+<section class="values-section spad bg-light">
+  <div class="container">
+    <div class="row gy-4 align-items-center">
+      <div class="col-lg-4">
+        <p class="section-kicker text-primary">Our ethos</p>
+        <h2>Values that guide every conversion</h2>
+        <p>Every workflow we design has to pass three filters: trust, usefulness, and speed.</p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-4 values-grid">
+          <div class="col-sm-6">
+            <div class="value-card">
+              <span class="value-icon"><i class="fa fa-shield-alt"></i></span>
+              <h5>Security first</h5>
+              <p>Bank-grade custody controls, audit trails, and segregated float accounts.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="value-card">
+              <span class="value-icon"><i class="fa fa-headset"></i></span>
+              <h5>Human support</h5>
+              <p>Agents and ops specialists respond in under 10 minutes on average.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="value-card">
+              <span class="value-icon"><i class="fa fa-chart-line"></i></span>
+              <h5>Radical transparency</h5>
+              <p>Real-time rates, no hidden spreads, and status pages for every payout.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="value-card">
+              <span class="value-icon"><i class="fa fa-leaf"></i></span>
+              <h5>Impact focus</h5>
+              <p>We reinvest in local liquidity partners and climate initiatives.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-</head>
-<body>
-	<!-- Page Preloder -->
-	<div id="preloder">
-		<div class="loader"></div>
-	</div>
+<section class="review-section spad">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-7">
+        <img src="{% static 'img/quote.png' %}" alt="quote" class="quote mb-4">
+        <div class="review-text-slider owl-carousel" data-review-text>
+          <div class="review-text">
+            <p>"Dust2Cash helped us recover hundreds of small balances from multiple exchanges and settle them into our working capital account in minutes."</p>
+            <strong>— Sharon, CFO at LoopPay</strong>
+          </div>
+          <div class="review-text">
+            <p>"As a creator, I get tips in dozens of tokens. Dust2Cash is the only service that lets me convert everything to M-Pesa on demand."</p>
+            <strong>— Eric, content creator</strong>
+          </div>
+          <div class="review-text">
+            <p>"Their agent network is incredibly responsive. Even weekend conversions feel like a breeze."</p>
+            <strong>— Yvonne, OTC trader</strong>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="review-meta-slider owl-carousel pt-3" data-review-meta>
+          <div class="author-meta">
+            <div class="author-avatar set-bg" data-setbg="{% static 'img/review/1.jpg' %}"></div>
+            <div class="author-name">
+              <h4>Sharon M.</h4>
+              <p>LoopPay CFO</p>
+            </div>
+          </div>
+          <div class="author-meta">
+            <div class="author-avatar set-bg" data-setbg="{% static 'img/review/2.jpg' %}"></div>
+            <div class="author-name">
+              <h4>Eric K.</h4>
+              <p>Creator</p>
+            </div>
+          </div>
+          <div class="author-meta">
+            <div class="author-avatar set-bg" data-setbg="{% static 'img/review/3.jpg' %}"></div>
+            <div class="author-name">
+              <h4>Yvonne T.</h4>
+              <p>OTC trader</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-	<!-- Header section -->
-	<header class="header-section clearfix">
-		<div class="container-fluid">
-			<a href="index.html" class="site-logo">
-				<img src="img/logo.png" alt="">
-			</a>
-			<div class="responsive-bar"><i class="fa fa-bars"></i></div>
-			<a href="" class="user"><i class="fa fa-user"></i></a>
-			<a href="" class="site-btn">Sign Up Free</a>
-			<nav class="main-menu">
-				<ul class="menu-list">
-					<li><a href="">Solution</a></li>
-					<li><a href="">Features</a></li>
-					<li><a href="">News</a></li>
-					<li><a href="">About</a></li>
-					<li><a href="">Contact</a></li>
-				</ul>
-			</nav>
-		</div>
-	</header>
-	<!-- Header section end -->
-
-
-	<!-- Page info section -->
-	<section class="page-info-section">
-		<div class="container">
-			<h2>About Us</h2>
-			<div class="site-beradcamb">
-				<a href="">Home</a>
-				<span><i class="fa fa-angle-right"></i> About Us</span>
-			</div>
-		</div>
-	</section>
-	<!-- Page info end -->
-
-
-	<!-- About section -->
-	<section class="about-section spad">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-6 offset-lg-6 about-text">
-					<h2>What is Bitcoin</h2>
-					<h5>Bitcoin is an innovative payment network and a new kind of money.</h5>
-					<p>Bitcoin is one of the most important inventions in all of human history. For the first time ever, anyone can send or receive any amount of money with anyone else, anywhere on the planet, conveniently and without restriction. It’s the dawn of a better, more free world.</p>
-					<a href="" class="site-btn sb-gradients sbg-line mt-5">Get Started</a>
-				</div>
-			</div>
-			<div class="about-img">
-				<img src="img/about-img.png" alt="">
-			</div>
-		</div>
-	</section>
-	<!-- About section end -->
-
-
-	<!-- Fact section -->
-	<section class="fact-section gradient-bg">
-		<div class="container">
-			<div class="row">
-				<div class="col-sm-6 col-md-6 col-lg-3">
-					<div class="fact">
-						<h2>60</h2>
-						<p>Support <br> Countries</p>
-						<i class="ti-basketball"></i>
-					</div>
-				</div>
-				<div class="col-sm-6 col-md-6 col-lg-3">
-					<div class="fact">
-						<h2>12K</h2>
-						<p>Transactions  <br> per hour</p>
-						<i class="ti-panel"></i>
-					</div>
-				</div>
-				<div class="col-sm-6 col-md-6 col-lg-3">
-					<div class="fact">
-						<h2>5B</h2>
-						<p>Largest <br> Transactions</p>
-						<i class="ti-stats-up"></i>
-					</div>
-				</div>
-				<div class="col-sm-6 col-md-6 col-lg-3">
-					<div class="fact">
-						<h2>240</h2>
-						<p>Years <br> of Experience</p>
-						<i class="ti-user"></i>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Fact section end -->
-
-
-	<!-- Team section -->
-	<section class="team-section spad">
-		<div class="container">
-			<div class="section-title text-center">
-				<h2>Meet Our Team</h2>
-				<p>Our experts in the field of crypto currency can always help you with any of your questions!</p>
-			</div>
-		</div>
-		<div class="team-members clearfix">
-			<!-- Team member -->
-			<div class="member">
-				<div class="member-text">
-					<div class="member-img set-bg" data-setbg="img/member/1.jpg"></div>
-					<h2>Tom Binegar</h2>
-					<span>Business Development</span>
-				</div>
-				<div class="member-social">
-					<a href=""><i class="fa fa-facebook"></i></a>
-					<a href=""><i class="fa fa-linkedin"></i></a>
-					<a href=""><i class="fa fa-twitter"></i></a>
-				</div>
-				<div class="member-info">
-					<div class="member-img mf set-bg" data-setbg="img/member/1.jpg"></div>
-					<div class="member-meta">
-						<h2>Tom Binegar</h2>
-						<span>Marketing Director</span>
-					</div>
-					<p>Jackson Nash is a full-time faculty member of the Marketing and Behavioural Science Division at the Sauder School of Business at UBC. He leads the Entrepreneurship Group, in the undergraduate and graduate programs, teaching actively in both of these.</p>
-				</div>
-			</div>
-			<!-- Team member -->
-			<div class="member">
-				<div class="member-text">
-					<div class="member-img set-bg" data-setbg="img/member/2.jpg"></div>
-					<h2>Jackson Nash</h2>
-					<span>Business Development</span>
-				</div>
-				<div class="member-social">
-					<a href=""><i class="fa fa-facebook"></i></a>
-					<a href=""><i class="fa fa-linkedin"></i></a>
-					<a href=""><i class="fa fa-twitter"></i></a>
-				</div>
-				<div class="member-info">
-					<div class="member-img mf set-bg" data-setbg="img/member/2.jpg"></div>
-					<div class="member-meta">
-						<h2>Jackson Nash</h2>
-						<span>Marketing Director</span>
-					</div>
-					<p>Jackson Nash is a full-time faculty member of the Marketing and Behavioural Science Division at the Sauder School of Business at UBC. He leads the Entrepreneurship Group, in the undergraduate and graduate programs, teaching actively in both of these.</p>
-				</div>
-			</div>
-			<!-- Team member -->
-			<div class="member">
-				<div class="member-text">
-					<div class="member-img set-bg" data-setbg="img/member/3.jpg"></div>
-					<h2>Tom Binegar</h2>
-					<span>Business Development</span>
-				</div>
-				<div class="member-social">
-					<a href=""><i class="fa fa-facebook"></i></a>
-					<a href=""><i class="fa fa-linkedin"></i></a>
-					<a href=""><i class="fa fa-twitter"></i></a>
-				</div>
-				<div class="member-info">
-					<div class="member-img mf set-bg" data-setbg="img/member/3.jpg"></div>
-					<div class="member-meta">
-						<h2>Aaron Ballance</h2>
-						<span>Ceo Bitcoin</span>
-					</div>
-					<p>Jackson Nash is a full-time faculty member of the Marketing and Behavioural Science Division at the Sauder School of Business at UBC. He leads the Entrepreneurship Group, in the undergraduate and graduate programs, teaching actively in both of these.</p>
-				</div>
-			</div>
-			<!-- Team member -->
-			<div class="member">
-				<div class="member-text">
-					<div class="member-img set-bg" data-setbg="img/member/4.jpg"></div>
-					<h2>Melissa Barth</h2>
-					<span>Product Manager</span>
-				</div>
-				<div class="member-social">
-					<a href=""><i class="fa fa-facebook"></i></a>
-					<a href=""><i class="fa fa-linkedin"></i></a>
-					<a href=""><i class="fa fa-twitter"></i></a>
-				</div>
-				<div class="member-info">
-					<div class="member-img mf set-bg" data-setbg="img/member/4.jpg"></div>
-					<div class="member-meta">
-						<h2>Melissa Barth</h2>
-						<span>Product Manager</span>
-					</div>
-					<p>Jackson Nash is a full-time faculty member of the Marketing and Behavioural Science Division at the Sauder School of Business at UBC. He leads the Entrepreneurship Group, in the undergraduate and graduate programs, teaching actively in both of these.</p>
-				</div>
-			</div>
-			<!-- Team member -->
-			<div class="member">
-				<div class="member-text">
-					<div class="member-img set-bg" data-setbg="img/member/5.jpg"></div>
-					<h2>Katy Abrams</h2>
-					<span>Head of Design</span>
-				</div>
-				<div class="member-social">
-					<a href=""><i class="fa fa-facebook"></i></a>
-					<a href=""><i class="fa fa-linkedin"></i></a>
-					<a href=""><i class="fa fa-twitter"></i></a>
-				</div>
-				<div class="member-info">
-					<div class="member-img mf set-bg" data-setbg="img/member/5.jpg"></div>
-					<div class="member-meta">
-						<h2>Katy Abrams</h2>
-						<span>Head of Design</span>
-					</div>
-					<p>Jackson Nash is a full-time faculty member of the Marketing and Behavioural Science Division at the Sauder School of Business at UBC. He leads the Entrepreneurship Group, in the undergraduate and graduate programs, teaching actively in both of these.</p>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Team section -->
-
-
-	<!-- Review section -->
-	<section class="review-section spad">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-8 push-8">
-					<img src="img/quote.png" alt="" class="quote mb-5">
-					<div class="review-text-slider owl-carousel">
-						<div class="review-text">
-							<p>"Bitcoin is exciting because it shows how cheap it can be. Bitcoin is better than currency in that you don’t have to be physically in the same place and, of course, for large transactions, currency can get pretty inconvenient.”</p>
-						</div>
-						<div class="review-text">
-							<p>"Bitcoin is exciting because it shows how cheap it can be. Bitcoin is better than currency in that you don’t have to be physically in the same place and, of course, for large transactions, currency can get pretty inconvenient.”</p>
-						</div>
-						<div class="review-text">
-							<p>"Bitcoin is exciting because it shows how cheap it can be. Bitcoin is better than currency in that you don’t have to be physically in the same place and, of course, for large transactions, currency can get pretty inconvenient.”</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-4 pr-0 pull-3">
-					<div class="review-meta-slider owl-carousel pt-5">
-						<div class="author-meta">
-							<div class="author-avatar set-bg" data-setbg="img/review/1.jpg"></div>
-							<div class="author-name">
-								<h4>Aaron Ballance</h4>
-								<p>Ceo Bitcoin</p>
-							</div>
-						</div>
-						<div class="author-meta">
-							<div class="author-avatar set-bg" data-setbg="img/review/2.jpg"></div>
-							<div class="author-name">
-								<h4>Jackson Nash</h4>
-								<p>Head of Design</p>
-							</div>
-						</div>
-						<div class="author-meta">
-							<div class="author-avatar set-bg" data-setbg="img/review/3.jpg"></div>
-							<div class="author-name">
-								<h4>Katy Abrams</h4>
-								<p>Product Manager</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Review section end -->
-
-
-	<!-- Newsletter section -->
-	<section class="newsletter-section gradient-bg">
-		<div class="container text-white">
-			<div class="row">
-				<div class="col-lg-7 newsletter-text">
-					<h2>Subscribe to our Newsletter</h2>
-					<p>Sign up for our weekly industry updates, insider perspectives and in-depth market analysis.</p>
-				</div>
-				<div class="col-lg-5 col-md-8 offset-lg-0 offset-md-2">
-					<form class="newsletter-form">
-						<input type="text" placeholder="Enter your email">
-						<button>Get Started</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</section>
-	<!-- Newsletter section end -->
-
-
-	<!-- Footer section -->
-	<footer class="footer-section">
-		<div class="container">
-			<div class="row spad">
-				<div class="col-md-6 col-lg-3 footer-widget">
-					<img src="img/logo.png" class="mb-4" alt="">
-					<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia dese mollit anim id est laborum.</p>
-					<span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></span>
-				</div>
-				<div class="col-md-6 col-lg-2 offset-lg-1 footer-widget">
-					<h5 class="widget-title">Resources</h5>
-					<ul>
-						<li><a href="#">How to Buy Coin</a></li>
-						<li><a href="#">Coin Overview</a></li>
-						<li><a href="#">Blog News</a></li>
-						<li><a href="#">How to Sell Coin</a></li>
-						<li><a href="#">Purchase Theme</a></li>
-					</ul>
-				</div>
-				<div class="col-md-6 col-lg-2 offset-lg-1 footer-widget">
-					<h5 class="widget-title">Quick Links</h5>
-					<ul>
-						<li><a href="#">Network Stats</a></li>
-						<li><a href="#">Block Explorers</a></li>
-						<li><a href="#">Governance</a></li>
-						<li><a href="#">Exchange Markets</a></li>
-						<li><a href="#">Get Theme</a></li>
-					</ul>
-				</div>
-				<div class="col-md-6 col-lg-3 footer-widget pl-lg-5 pl-3">
-					<h5 class="widget-title">Follow Us</h5>
-					<div class="social">
-						<a href="" class="facebook"><i class="fa fa-facebook"></i></a>
-						<a href="" class="google"><i class="fa fa-google-plus"></i></a>
-						<a href="" class="instagram"><i class="fa fa-instagram"></i></a>
-						<a href="" class="twitter"><i class="fa fa-twitter"></i></a>
-					</div>
-				</div>
-			</div>
-			<div class="footer-bottom">
-				<div class="row">
-					<div class="col-lg-4 store-links text-center text-lg-left pb-3 pb-lg-0">
-						<a href=""><img src="img/appstore.png" alt="" class="mr-2"></a>
-						<a href=""><img src="img/playstore.png" alt=""></a>
-					</div>
-					<div class="col-lg-8 text-center text-lg-right">
-						<ul class="footer-nav">
-							<li><a href="">DPA</a></li>
-							<li><a href="">Terms of Use</a></li>
-							<li><a href="">Privacy Policy </a></li>
-							<li><a href="">support@company.com</a></li>
-							<li><a href="">(123) 456-7890</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</footer>
-
-
-	<!--====== Javascripts & Jquery ======-->
-	<script src="js/jquery-3.2.1.min.js"></script>
-	<script src="js/owl.carousel.min.js"></script>
-	<script src="js/main.js"></script>
-</body>
-</html>
+<section class="newsletter-section gradient-bg">
+  <div class="container text-white">
+    <div class="row gy-4 align-items-center">
+      <div class="col-lg-7">
+        <h2>Stay in the loop</h2>
+        <p>Weekly dispatches on liquidity, FX spreads, and new payout markets.</p>
+      </div>
+      <div class="col-lg-5 col-md-8 offset-lg-0 offset-md-2">
+        <form class="newsletter-form" method="post" action="/newsletter/">
+          {% csrf_token %}
+          <input type="email" name="email" placeholder="Enter your email" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %}

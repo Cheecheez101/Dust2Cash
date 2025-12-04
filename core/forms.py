@@ -5,9 +5,9 @@ from .models import ClientProfile, Transaction
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-        label="Email"
+    identifier = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Email or Username'}),
+        label="Email or Username"
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Edit Transaction — Admin Console{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Edit transaction #{{ object.id }}</h2>
+    <div class="site-beradcamb">
+      <a href="/console/">Admin</a>
+      <span><i class="fa fa-angle-right"></i> Transactions</span>
+    </div>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-primary">Save</button>
+          <a class="btn btn-link" href="/console/transactions/">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

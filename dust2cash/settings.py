@@ -52,6 +52,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.dust2cash_settings',
+                'core.context_processors.user_portal',
             ],
         },
     },

@@ -78,5 +78,40 @@
       // Catch all — prevents this script from breaking other scripts on the page
       console.error('Landing JS initialization error', err);
     }
+
+    // About page interactions
+    document.querySelectorAll('.team-card').forEach(function(card){
+      card.addEventListener('mouseenter', function(){ card.classList.add('is-hovered'); });
+      card.addEventListener('mouseleave', function(){ card.classList.remove('is-hovered'); });
+    });
+
+    // Sync review sliders if Owl Carousel present
+    var $textSlider = window.jQuery && window.jQuery('[data-review-text]');
+    var $metaSlider = window.jQuery && window.jQuery('[data-review-meta]');
+    if ($textSlider && $textSlider.length && typeof $textSlider.owlCarousel === 'function') {
+      $textSlider.owlCarousel({
+        items: 1,
+        loop: true,
+        autoplay: true,
+        autoplayTimeout: 6000,
+        dots: true,
+        nav: false,
+        onChanged: function(event){
+          if ($metaSlider && $metaSlider.data('owl.carousel')) {
+            $metaSlider.trigger('to.owl.carousel', [event.item.index, 300, true]);
+          }
+        }
+      });
+    }
+    if ($metaSlider && $metaSlider.length && typeof $metaSlider.owlCarousel === 'function') {
+      $metaSlider.owlCarousel({
+        items: 1,
+        loop: true,
+        dots: true,
+        nav: false,
+        autoplay: true,
+        autoplayTimeout: 6000
+      });
+    }
   });
 })();

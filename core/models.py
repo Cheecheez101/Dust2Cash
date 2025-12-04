@@ -2,14 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from decimal import Decimal
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 
-@login_required
-def agent_portal(request):
-    if not hasattr(request.user, 'agent_profile'):
-        return redirect('client_dashboard')  # or return 403
-    return render(request, 'agent/portal.html')
+
+class AdminProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_profile')
+    title = models.CharField(max_length=120, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Admin: {self.user.get_full_name() or self.user.username}"
 
 
 class ClientProfile(models.Model):

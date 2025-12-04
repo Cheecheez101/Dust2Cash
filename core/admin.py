@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import ClientProfile, AgentProfile, Transaction, AgentRequest
+from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest
+
+
+@admin.register(AdminProfile)
+class AdminProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'title', 'phone_number', 'created_at')
+    search_fields = ('user__username', 'user__email', 'title', 'phone_number')
 
 
 @admin.register(ClientProfile)

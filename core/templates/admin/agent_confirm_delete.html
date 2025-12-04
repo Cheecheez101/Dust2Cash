@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Delete Agent — Admin Console{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Delete agent</h2>
+    <div class="site-beradcamb">
+      <a href="/console/">Admin</a>
+      <span><i class="fa fa-angle-right"></i> Delete</span>
+    </div>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p>Are you sure you want to delete agent {{ object.user.username }}?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger">Delete</button>
+          <a class="btn btn-link" href="/console/agents/">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

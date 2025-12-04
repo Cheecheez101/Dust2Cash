@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Delete Transaction — Admin Console{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Delete transaction #{{ object.id }}</h2>
+    <div class="site-beradcamb">
+      <a href="/console/">Admin</a>
+      <span><i class="fa fa-angle-right"></i> Transactions</span>
+    </div>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p>Are you sure you want to delete this transaction?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger">Delete</button>
+          <a class="btn btn-link" href="/console/transactions/">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

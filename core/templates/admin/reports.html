@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Reports — Admin Console{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <h2>Reports & Exports</h2>
+    <div class="site-beradcamb">
+      <a href="/console/">Admin</a>
+      <span><i class="fa fa-angle-right"></i> Reports</span>
+    </div>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5>Client roster</h5>
+            <p class="text-muted">Full list of registered clients with contact info.</p>
+            <a href="{% url 'export_clients_csv' %}" class="btn btn-outline-primary btn-sm">Download CSV</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5>Agent roster</h5>
+            <p class="text-muted">Agents, availability, and last online times.</p>
+            <a href="{% url 'export_agents_csv' %}" class="btn btn-outline-primary btn-sm">Download CSV</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5>Transaction log</h5>
+            <p class="text-muted">All conversions with status and payout data.</p>
+            <a href="{% url 'export_transactions_csv' %}" class="btn btn-outline-primary btn-sm">Download CSV</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
