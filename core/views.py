@@ -626,6 +626,18 @@ class AdminTransactionDeleteView(DeleteView):
 class AdminReportsView(TemplateView):
     template_name = 'admin/reports.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        clients = ClientProfile.objects.select_related('user').order_by('-created_at')[:25]
+        agents = AgentProfile.objects.select_related('user').order_by('-last_online')[:25]
+        transactions = Transaction.objects.select_related('client__user', 'agent__user').order_by('-created_at')[:50]
+        context.update({
+            'clients_preview': clients,
+            'agents_preview': agents,
+            'transactions_preview': transactions,
+        })
+        return context
+
 
 @staff_member_required
 def export_clients_csv(request):
