@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Application #{{ application.pk }}{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <div class="site-beradcamb">
+      <a href="{% url 'admin_dashboard' %}">Console</a>
+      <span><i class="fa fa-angle-right"></i> <a href="{% url 'admin_applications' %}">Applications</a></span>
+      <span><i class="fa fa-angle-right"></i> {{ application.full_name }}</span>
+    </div>
+    <h2 class="mt-2">Application for {{ application.full_name }}</h2>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+          <div>
+            <h4 class="mb-0">Applicant details</h4>
+            <p class="text-muted mb-0">Submitted {{ application.submitted_at|date:"M d, Y H:i" }}</p>
+          </div>
+          <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="{% url 'admin_application_verify' application.pk %}" class="btn btn-success btn-sm">Verify</a>
+            <a href="{% url 'admin_application_cancel' application.pk %}" class="btn btn-warning btn-sm">Cancel</a>
+            <a href="{% url 'admin_application_create_user' application.pk %}" class="btn btn-primary btn-sm">Create Admin User</a>
+            <a href="{% url 'admin_application_delete' application.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6>Contact</h6>
+            <p class="mb-1"><strong>Email:</strong> {{ application.email }}</p>
+            <p class="mb-1"><strong>Phone:</strong> {{ application.phone_number }}</p>
+            <p class="mb-1"><strong>Location:</strong> {{ application.city }}, {{ application.country }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Identity</h6>
+            <p class="mb-1"><strong>ID Type:</strong> {{ application.get_id_type_display }}</p>
+            <p class="mb-1"><strong>ID Number:</strong> {{ application.id_number }}</p>
+            <p class="mb-1"><strong>Date of Birth:</strong> {{ application.date_of_birth }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Experience</h6>
+            <p><strong>Years:</strong> {{ application.years_of_experience }}</p>
+            <p><strong>Platforms:</strong> {{ application.platforms_supported }}</p>
+            <p><strong>Fiat payouts:</strong> {{ application.fiat_payout_methods }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Compliance & Liquidity</h6>
+            <p><strong>Daily capacity:</strong> ${{ application.daily_liquidity_capacity }}</p>
+            <p><strong>AML policy:</strong> {{ application.has_aml_policy|yesno:"Yes,No" }}</p>
+            <p><strong>Background check:</strong> {{ application.accepts_background_check|yesno:"Yes,No" }}</p>
+          </div>
+          <div class="col-12">
+            <h6>Compliance experience</h6>
+            <p class="mb-0">{{ application.compliance_experience|linebreaksbr }}</p>
+          </div>
+          <div class="col-12">
+            <h6>Crypto addresses</h6>
+            <p class="mb-0">{{ application.crypto_addresses|linebreaksbr }}</p>
+          </div>
+          {% if application.additional_notes %}
+          <div class="col-12">
+            <h6>Additional notes</h6>
+            <p class="mb-0">{{ application.additional_notes|linebreaksbr }}</p>
+          </div>
+          {% endif %}
+          {% if application.review_notes %}
+          <div class="col-12">
+            <h6>Review notes</h6>
+            <p class="mb-0">{{ application.review_notes|linebreaksbr }}</p>
+          </div>
+          {% endif %}
+        </div>
+        <hr class="my-4">
+        <form method="post" action="{% url 'admin_application_detail' application.pk %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Review notes</label>
+            <textarea class="form-control" name="review_notes" rows="4">{{ application.review_notes }}</textarea>
+          </div>
+          <button class="btn btn-outline-secondary" type="submit">Save notes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

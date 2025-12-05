@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Create Admin User{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <div class="site-beradcamb">
+      <a href="{% url 'admin_applications' %}">Applications</a>
+      <span><i class="fa fa-angle-right"></i> Create User</span>
+    </div>
+    <h2>Create admin user for {{ application.full_name }}</h2>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-primary" type="submit">Create user</button>
+          <a class="btn btn-outline-secondary" href="{% url 'admin_application_detail' application.pk %}">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -175,73 +175,114 @@
 
 <section class="review-section spad">
   <div class="container">
-    <div class="row align-items-center gy-5">
-      <div class="col-lg-7">
-        <img src="{% static 'img/quote.png' %}" alt="quote" class="quote mb-4">
-        <div class="review-text-slider owl-carousel" data-review-text>
-          <div class="review-text">
-            <p>"Dust2Cash helped us recover hundreds of small balances from multiple exchanges and settle them into our working capital account in minutes."</p>
-            <strong>— Sharon, CFO at LoopPay</strong>
+    <div class="section-title text-center">
+      <p class="section-kicker">What clients say</p>
+      <h2>Reviews from our users</h2>
+      <p>Real feedback from real users, helping us to constantly improve.</p>
+    </div>
+    <div class="review-slider owl-carousel">
+      <div class="review-item">
+        <div class="review-avatar">
+          <img src="{% static 'img/mike2.jpg' %}" alt="Client photo">
+        </div>
+        <div class="review-content">
+          <h5>Jane Doe</h5>
+          <span>Crypto Trader</span>
+          <p>"Dust2Cash has changed the way I think about my crypto holdings. The process is so simple and the rates are fantastic!"</p>
+        </div>
+      </div>
+      <div class="review-item">
+        <div class="review-avatar">
+          <img src="{% static 'img/mike.jpg' %}" alt="Client photo">
+        </div>
+        <div class="review-content">
+          <h5>John Smith</h5>
+          <span>Business Owner</span>
+          <p>"As a business owner, I need reliable and fast payment solutions. Dust2Cash delivers every time!"</p>
+        </div>
+      </div>
+      <div class="review-item">
+        <div class="review-avatar">
+          <img src="{% static 'img/mike2.jpg' %}" alt="Client photo">
+        </div>
+        <div class="review-content">
+          <h5>Alice Johnson</h5>
+          <span>Investor</span>
+          <p>"I love the transparency and speed of Dust2Cash. It's a game changer for crypto investors."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="agent-picker spad bg-light ">
+  <div class="container">
+    <div class="section-title text-center">
+      <p class="section-kicker">Get started</p>
+      <h2>Join our agent network</h2>
+      <p>Partner with Dust2Cash to offer seamless crypto-to-cash conversions.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 col-sm-6">
+        <div class="agent-card">
+          <div class="agent-icon">
+            <i class="fa fa-wallet"></i>
           </div>
-          <div class="review-text">
-            <p>"As a creator, I get tips in dozens of tokens. Dust2Cash is the only service that lets me convert everything to M-Pesa on demand."</p>
-            <strong>— Eric, content creator</strong>
-          </div>
-          <div class="review-text">
-            <p>"Their agent network is incredibly responsive. Even weekend conversions feel like a breeze."</p>
-            <strong>— Yvonne, OTC trader</strong>
+          <div class="agent-content">
+            <h5>Flexible liquidity</h5>
+            <p>Access to a wide range of crypto and fiat pairs, with competitive spreads.</p>
           </div>
         </div>
       </div>
-      <div class="col-lg-5">
-        <div class="review-meta-slider owl-carousel pt-3" data-review-meta>
-          <div class="author-meta">
-            <div class="author-avatar set-bg" data-setbg="{% static 'img/1.jpg' %}"></div>
-            <div class="author-name">
-              <h4>Sharon M.</h4>
-              <p>LoopPay CFO</p>
-            </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="agent-card">
+          <div class="agent-icon">
+            <i class="fa fa-clock"></i>
           </div>
-          <div class="author-meta">
-            <div class="author-avatar set-bg" data-setbg="{% static 'img/2.jpg' %}"></div>
-            <div class="author-name">
-              <h4>Eric K.</h4>
-              <p>Creator</p>
-            </div>
-          </div>
-          <div class="author-meta">
-            <div class="author-avatar set-bg" data-setbg="{% static 'img/3.jpg' %}"></div>
-            <div class="author-name">
-              <h4>Yvonne T.</h4>
-              <p>OTC trader</p>
-            </div>
+          <div class="agent-content">
+            <h5>Fast settlements</h5>
+            <p>Enjoy quick turnaround times and reliable payment tracking.</p>
           </div>
         </div>
       </div>
+      <div class="col-lg-4 col-sm-6">
+        <div class="agent-card">
+          <div class="agent-icon">
+            <i class="fa fa-shield-alt"></i>
+          </div>
+          <div class="agent-content">
+            <h5>Secure transactions</h5>
+            <p>Benefit from bank-grade security and dedicated support.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'apply_agent' %}" class="btn btn-gradient btn-lg">Apply to be an agent</a>
     </div>
   </div>
 </section>
 
 <section class="newsletter-section gradient-bg">
-  <div class="container text-white">
-    <div class="row gy-4 align-items-center">
-      <div class="col-lg-7">
-        <h2>Stay in the loop</h2>
-        <p>Weekly dispatches on liquidity, FX spreads, and new payout markets.</p>
-      </div>
-      <div class="col-lg-5 col-md-8 offset-lg-0 offset-md-2">
-        <form class="newsletter-form" method="post" action="/newsletter/">
-          {% csrf_token %}
-          <input type="email" name="email" placeholder="Enter your email" required>
-          <button type="submit">Subscribe</button>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <div class="newsletter-content">
+          <h2>Stay updated</h2>
+          <p>Subscribe to our newsletter for the latest news, updates, and offers from Dust2Cash.</p>
+        </div>
+        <form action="#" class="newsletter-form">
+          <input type="email" placeholder="Enter your email" required>
+          <button type="submit" class="btn btn-primary">Subscribe</button>
         </form>
       </div>
     </div>
   </div>
 </section>
+
+
 {% endblock %}
 {% block extra_scripts %}
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
-
 {% endblock %}

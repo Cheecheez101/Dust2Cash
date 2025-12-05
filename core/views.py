@@ -11,12 +11,13 @@ import csv
 from django.http import HttpResponse, Http404, JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
-from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
-from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile
-from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm
+from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication
+from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm
 from .decorators import agent_required, client_required
 
 
@@ -25,7 +26,8 @@ def landing(request):
 
 
 def about_page(request):
-    return render(request, 'about.html')
+    active_agents = AgentProfile.objects.filter(is_online=True).select_related('user').order_by('user__first_name')
+    return render(request, 'about.html', {'active_agents': active_agents})
 
 
 def contact_page(request):
@@ -493,6 +495,7 @@ class AdminDashboardView(TemplateView):
             'agent_count': AgentProfile.objects.count(),
             'transaction_count': Transaction.objects.count(),
             'reports_count': Transaction.objects.count(),
+            'application_count': AgentApplication.objects.filter(status=AgentApplication.STATUS_PENDING).count(),
         })
         return context
 
@@ -630,11 +633,23 @@ class AdminReportsView(TemplateView):
         context = super().get_context_data(**kwargs)
         clients = ClientProfile.objects.select_related('user').order_by('-created_at')[:25]
         agents = AgentProfile.objects.select_related('user').order_by('-last_online')[:25]
-        transactions = Transaction.objects.select_related('client__user', 'agent__user').order_by('-created_at')[:50]
+        transactions_qs = Transaction.objects.select_related('client__user', 'agent__user').order_by('-created_at')
+        status_filter = self.request.GET.get('status') or ''
+        platform_filter = self.request.GET.get('platform') or ''
+        if status_filter:
+            transactions_qs = transactions_qs.filter(status=status_filter)
+        if platform_filter:
+            transactions_qs = transactions_qs.filter(platform=platform_filter)
         context.update({
             'clients_preview': clients,
             'agents_preview': agents,
-            'transactions_preview': transactions,
+            'transactions_preview': transactions_qs[:50],
+            'transaction_status_choices': Transaction.STATUS_CHOICES,
+            'transaction_platform_choices': Transaction.PLATFORM_CHOICES,
+            'active_filters': {
+                'status': status_filter,
+                'platform': platform_filter,
+            }
         })
         return context
 
@@ -670,3 +685,106 @@ def export_transactions_csv(request):
     for tx in Transaction.objects.select_related('client', 'agent'):
         writer.writerow([tx.id, str(tx.client), str(tx.agent) if tx.agent else '', tx.amount, tx.get_currency_display(), tx.get_status_display(), tx.created_at])
     return response
+
+
+def apply_agent(request):
+    if request.method == 'POST':
+        form = AgentApplicationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Application submitted! Our compliance team will reach out soon.')
+            return redirect('apply_agent')
+    else:
+        form = AgentApplicationForm()
+    return render(request, 'agent/apply.html', {'form': form})
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentApplicationListView(ListView):
+    model = AgentApplication
+    template_name = 'admin/applications_list.html'
+    context_object_name = 'applications'
+    paginate_by = 25
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        return qs
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentApplicationDetailView(TemplateView):
+    template_name = 'admin/application_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        application = get_object_or_404(AgentApplication, pk=kwargs['pk'])
+        context['application'] = application
+        return context
+
+    def post(self, request, *args, **kwargs):
+        application = get_object_or_404(AgentApplication, pk=kwargs['pk'])
+        application.review_notes = request.POST.get('review_notes', '').strip()
+        application.reviewed_by = request.user
+        application.reviewed_at = timezone.now()
+        application.save(update_fields=['review_notes', 'reviewed_by', 'reviewed_at'])
+        messages.success(request, 'Review notes updated.')
+        return redirect('admin_application_detail', pk=application.pk)
+
+
+@staff_member_required
+def admin_application_verify(request, pk):
+    application = get_object_or_404(AgentApplication, pk=pk)
+    application.status = AgentApplication.STATUS_VERIFIED
+    application.reviewed_by = request.user
+    application.reviewed_at = timezone.now()
+    application.save(update_fields=['status', 'reviewed_by', 'reviewed_at'])
+    messages.success(request, 'Application marked as verified.')
+    return redirect('admin_application_detail', pk=pk)
+
+
+@staff_member_required
+def admin_application_cancel(request, pk):
+    application = get_object_or_404(AgentApplication, pk=pk)
+    application.status = AgentApplication.STATUS_CANCELLED
+    application.reviewed_by = request.user
+    application.reviewed_at = timezone.now()
+    application.save(update_fields=['status', 'reviewed_by', 'reviewed_at'])
+    messages.success(request, 'Application marked as cancelled.')
+    return redirect('admin_application_detail', pk=pk)
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentApplicationDeleteView(DeleteView):
+    model = AgentApplication
+    template_name = 'admin/application_confirm_delete.html'
+    success_url = reverse_lazy('admin_applications')
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminApplicationCreateUserView(FormView):
+    template_name = 'admin/application_create_user.html'
+    form_class = UserCreationForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.application = get_object_or_404(AgentApplication, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.first_name = self.application.full_name.split(' ')[0]
+        user.last_name = ' '.join(self.application.full_name.split(' ')[1:])
+        user.email = self.application.email
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        AgentProfile.objects.get_or_create(user=user)
+        messages.success(self.request, 'Admin user created and linked to application.')
+        return redirect('admin_application_detail', pk=self.application.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['application'] = self.application
+        return context

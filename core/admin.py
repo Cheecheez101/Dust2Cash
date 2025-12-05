@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest
+from django.utils import timezone
+from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest, AgentApplication
 
 
 @admin.register(AdminProfile)
@@ -44,3 +45,23 @@ class TransactionAdmin(admin.ModelAdmin):
 class AgentRequestAdmin(admin.ModelAdmin):
     list_display = ('transaction', 'requested_at', 'expires_at', 'is_accepted', 'is_expired')
     list_filter = ('is_accepted', 'is_expired', 'requested_at')
+
+
+@admin.register(AgentApplication)
+class AgentApplicationAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'phone_number', 'country', 'status', 'submitted_at')
+    list_filter = ('status', 'country', 'has_aml_policy', 'accepts_background_check')
+    search_fields = ('full_name', 'email', 'phone_number', 'id_number')
+    readonly_fields = ('submitted_at', 'reviewed_at', 'reviewed_by')
+    actions = ['mark_verified', 'mark_cancelled']
+
+    def mark_verified(self, request, queryset):
+        updated = queryset.update(status=AgentApplication.STATUS_VERIFIED, reviewed_by=request.user, reviewed_at=timezone.now())
+        self.message_user(request, f"{updated} application(s) marked as verified")
+
+    def mark_cancelled(self, request, queryset):
+        updated = queryset.update(status=AgentApplication.STATUS_CANCELLED, reviewed_by=request.user, reviewed_at=timezone.now())
+        self.message_user(request, f"{updated} application(s) marked as cancelled")
+
+    mark_verified.short_description = 'Mark selected applications as verified'
+    mark_cancelled.short_description = 'Mark selected applications as cancelled'

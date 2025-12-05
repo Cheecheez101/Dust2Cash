@@ -53,6 +53,14 @@
           <a href="{% url 'admin_reports' %}" class="stretched-link">Go to reports</a>
         </div>
       </div>
+      <div class="col">
+        <div class="metric-card">
+          <div class="metric-icon bg-danger-subtle text-danger"><i class="fa fa-file-alt"></i></div>
+          <p class="metric-label">Agent Applications</p>
+          <p class="metric-value">{{ application_count }}</p>
+          <a href="{% url 'admin_applications' %}" class="stretched-link">Review applications</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>

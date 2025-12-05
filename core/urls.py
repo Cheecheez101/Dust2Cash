@@ -43,4 +43,12 @@ urlpatterns = [
     path('console/reports/clients.csv', views.export_clients_csv, name='export_clients_csv'),
     path('console/reports/agents.csv', views.export_agents_csv, name='export_agents_csv'),
     path('console/reports/transactions.csv', views.export_transactions_csv, name='export_transactions_csv'),
+    path('agents/apply/', views.apply_agent, name='apply_agent'),
+
+    path('console/applications/', views.AdminAgentApplicationListView.as_view(), name='admin_applications'),
+    path('console/application/<int:pk>/', views.AdminAgentApplicationDetailView.as_view(), name='admin_application_detail'),
+    path('console/application/<int:pk>/verify/', views.admin_application_verify, name='admin_application_verify'),
+    path('console/application/<int:pk>/cancel/', views.admin_application_cancel, name='admin_application_cancel'),
+    path('console/application/<int:pk>/delete/', views.AdminAgentApplicationDeleteView.as_view(), name='admin_application_delete'),
+    path('console/application/<int:pk>/create-user/', views.AdminApplicationCreateUserView.as_view(), name='admin_application_create_user'),
 ]

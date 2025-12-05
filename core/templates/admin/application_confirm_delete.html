@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Delete Application{% endblock %}
+{% block content %}
+<section class="page-info-section">
+  <div class="container">
+    <div class="site-beradcamb">
+      <a href="{% url 'admin_applications' %}">Applications</a>
+      <span><i class="fa fa-angle-right"></i> Delete</span>
+    </div>
+    <h2>Delete application</h2>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p>Are you sure you want to delete the application for <strong>{{ object.full_name }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">Yes, delete</button>
+          <a class="btn btn-outline-secondary" href="{% url 'admin_application_detail' object.pk %}">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

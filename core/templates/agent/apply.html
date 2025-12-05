@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Apply to Be a Dust2Cash Agent{% endblock %}
+{% block content %}
+<section class="page-info-section page-info-admin">
+  <div class="container">
+    <div class="site-beradcamb">
+      <a href="/">Home</a>
+      <span><i class="fa fa-angle-right"></i> Apply as Agent</span>
+
+    </div>
+    <h2 class="mt-2">Join the Dust2Cash Agent Network</h2>
+    <p class="text-muted">Provide your legal and compliance information. Our team reviews every submission carefully.</p>
+  </div>
+</section>
+<section class="spad">
+  <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <div class="card shadow-sm">
+      <div class="card-body p-4 p-lg-5">
+        <h3 class="mb-4">Agent application</h3>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="row g-4">
+            <div class="col-md-6">
+              <label class="form-label">Full name *</label>
+              {{ form.full_name }}
+              {{ form.full_name.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email *</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone *</label>
+              {{ form.phone_number }}
+              {{ form.phone_number.errors }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Country *</label>
+              {{ form.country }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">City *</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ID type *</label>
+              {{ form.id_type }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">ID number *</label>
+              {{ form.id_number }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of birth *</label>
+              {{ form.date_of_birth }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Experience (years) *</label>
+              {{ form.years_of_experience }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Platforms supported *</label>
+              {{ form.platforms_supported }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Fiat payout methods *</label>
+              {{ form.fiat_payout_methods }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Crypto addresses *</label>
+              {{ form.crypto_addresses }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Daily liquidity capacity (USD) *</label>
+              {{ form.daily_liquidity_capacity }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Compliance / AML experience *</label>
+              {{ form.compliance_experience }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Additional notes</label>
+              {{ form.additional_notes }}
+            </div>
+            <div class="col-md-4">
+              <div class="form-check">
+                {{ form.has_aml_policy }}
+                <label class="form-check-label">I have a written AML/KYC policy</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-check">
+                {{ form.accepts_background_check }}
+                <label class="form-check-label">I accept background screening</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-check">
+                {{ form.terms_acknowledged }}
+                <label class="form-check-label">I agree to Dust2Cash terms</label>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button class="btn btn-gradient btn-lg" type="submit">Submit application</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

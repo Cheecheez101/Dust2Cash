@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from decimal import Decimal
+from django.core.validators import MinValueValidator, RegexValidator
 
 
 class AdminProfile(models.Model):
@@ -128,3 +129,51 @@ class AgentRequest(models.Model):
 
     def __str__(self):
         return f"Request for Transaction {self.transaction.id}"
+
+
+class AgentApplication(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_VERIFIED = 'verified'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending Review'),
+        (STATUS_VERIFIED, 'Verified'),
+        (STATUS_CANCELLED, 'Cancelled'),
+    ]
+    ID_TYPE_CHOICES = [
+        ('national_id', 'National ID'),
+        ('passport', 'Passport'),
+        ('drivers_license', "Driver's License"),
+        ('other', 'Other Official ID'),
+    ]
+    EXPERIENCE_CHOICES = [(i, f"{i}+ years") for i in range(0, 11)]
+
+    full_name = models.CharField(max_length=120)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20, validators=[RegexValidator(r"^[0-9+\- ]+$", 'Use digits and + - only')])
+    country = models.CharField(max_length=80)
+    city = models.CharField(max_length=80)
+    id_type = models.CharField(max_length=20, choices=ID_TYPE_CHOICES)
+    id_number = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    years_of_experience = models.PositiveIntegerField(validators=[MinValueValidator(0)])
+    platforms_supported = models.CharField(max_length=255, help_text='List exchanges / wallets you can service')
+    fiat_payout_methods = models.CharField(max_length=255, help_text='e.g. M-Pesa, Airtel Money, Bank wires')
+    crypto_addresses = models.TextField(help_text='List of addresses for supported assets')
+    daily_liquidity_capacity = models.DecimalField(max_digits=12, decimal_places=2, help_text='USD equivalent you can process per day')
+    compliance_experience = models.TextField(help_text='Describe AML/KYC controls you have previously followed')
+    has_aml_policy = models.BooleanField(default=False)
+    accepts_background_check = models.BooleanField(default=False)
+    terms_acknowledged = models.BooleanField(default=False)
+    additional_notes = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    review_notes = models.TextField(blank=True)
+    reviewed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_agent_applications')
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"Agent application - {self.full_name}"
