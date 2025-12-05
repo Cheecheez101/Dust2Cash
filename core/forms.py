@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import ClientProfile, Transaction
+from .models import ClientProfile, Transaction, AgentProfile
 
 
 class LoginForm(forms.Form):
@@ -50,6 +50,13 @@ class ClientProfileForm(forms.ModelForm):
 
 
 class TransactionForm(forms.ModelForm):
+    agent = forms.ModelChoiceField(
+        queryset=AgentProfile.objects.none(),
+        required=False,
+        label='Choose an online agent',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Transaction
         fields = ('platform', 'currency', 'amount', 'payment_method', 'payment_phone')
@@ -60,3 +67,14 @@ class TransactionForm(forms.ModelForm):
             'payment_method': forms.Select(attrs={'class': 'form-control'}),
             'payment_phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number for Payment'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        active_agents = kwargs.pop('active_agents', AgentProfile.objects.filter(is_online=True))
+        super().__init__(*args, **kwargs)
+        field = self.fields['agent']
+        field.queryset = active_agents
+        field.empty_label = 'Select an agent'
+        if active_agents.exists():
+            field.required = True
+        else:
+            field.widget = forms.HiddenInput()

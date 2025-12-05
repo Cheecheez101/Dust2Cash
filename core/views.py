@@ -161,31 +161,29 @@ def create_transaction(request):
     except ClientProfile.DoesNotExist:
         messages.warning(request, 'Please complete your profile first')
         return redirect('client_profile')
-    
-    agent_online = AgentProfile.objects.filter(is_online=True).exists()
-    
-    form = TransactionForm(request.POST or None)
+
+    active_agents = AgentProfile.objects.filter(is_online=True)
+    if not active_agents.exists():
+        messages.warning(request, 'No agent is currently online. Please try again once an agent is available.')
+        return redirect('client_dashboard')
+
+    form = TransactionForm(request.POST or None, active_agents=active_agents)
     if request.method == "POST" and form.is_valid():
         transaction = form.save(commit=False)
         transaction.client = profile
         transaction.calculate_amount_to_receive()
-        
-        if agent_online:
-            available_agent = AgentProfile.objects.filter(is_online=True).first()
-            transaction.agent = available_agent
-            transaction.status = 'agent_online'
-            transaction.save()
-            messages.success(request, 'Transaction created! Agent is online.')
-            return redirect('request_address', transaction_id=transaction.id)
-        else:
-            transaction.status = 'pending'
-            transaction.save()
-            messages.info(request, 'No agent is currently online. You can request assistance.')
-            return redirect('request_agent', transaction_id=transaction.id)
-    
+        transaction.agent = form.cleaned_data['agent']
+        transaction.status = 'agent_online'
+        transaction.save()
+        messages.success(
+            request,
+            f'Transaction created! {transaction.agent.user.get_full_name() or transaction.agent.user.username} will assist you.'
+        )
+        return redirect('request_address', transaction_id=transaction.id)
+
     return render(request, 'client/create_transaction.html', {
         'form': form,
-        'agent_online': agent_online
+        'active_agents': active_agents,
     })
 
 

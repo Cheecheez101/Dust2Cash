@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -30,11 +29,11 @@
         <div class="card-body p-5">
           <h2 class="mb-3">Create New Transaction</h2>
           
-          {% if not agent_online %}
-            <div class="alert alert-warning">
-              <strong>No agent is currently online.</strong> You can still create your transaction, and you'll be able to request agent assistance afterward.
-            </div>
-          {% endif %}
+<!--          {% if not agent_offline %}-->
+<!--            <div class="alert alert-warning">-->
+<!--              <strong>No agent is currently online.</strong> You can still create your transaction, and you'll be able to request agent assistance afterward.-->
+<!--            </div>-->
+<!--          {% endif %}-->
 
           {% if messages %}
             {% for message in messages %}
@@ -79,6 +78,26 @@
               {{ form.payment_phone }}
               {% if form.payment_phone.errors %}<div class="text-danger small">{{ form.payment_phone.errors.0 }}</div>{% endif %}
               <div class="form-text">Enter the M-Pesa or Airtel Money number for payment</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Assign to Agent</label>
+              {% if form.agent.is_hidden %}
+                <p class="text-muted mb-0">No agents are online right now. Please try again once an agent is available.</p>
+              {% else %}
+                <p class="small text-muted">Select an active agent. Their username and phone number are shown for quick reference.</p>
+                {{ form.agent }}
+                {% if form.agent.errors %}
+                  <div class="text-danger small">{{ form.agent.errors.0 }}</div>
+                {% endif %}
+                <div class="mt-2">
+                  {% for agent in active_agents %}
+                    <div class="small text-muted">
+                      <strong>{{ agent.user.get_full_name|default:agent.user.username }}</strong> · {{ agent.user.username }} · {{ agent.phone_number|default:'No phone on file' }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
 
             <div class="card bg-light border-0 p-3 mb-4">
