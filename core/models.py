@@ -166,6 +166,7 @@ class AgentApplication(models.Model):
     accepts_background_check = models.BooleanField(default=False)
     terms_acknowledged = models.BooleanField(default=False)
     additional_notes = models.TextField(blank=True)
+    created_user = models.OneToOneField(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='originating_application')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
     review_notes = models.TextField(blank=True)
     reviewed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_agent_applications')

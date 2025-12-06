@@ -4,7 +4,7 @@
 <section class="page-info-section">
   <div class="container">
     <div class="site-beradcamb">
-      <a href="{% url 'admin_dashboard' %}">Console</a>
+      <a href="{% url 'admin_dashboard' %}">Admin</a>
       <span><i class="fa fa-angle-right"></i> <a href="{% url 'admin_applications' %}">Applications</a></span>
       <span><i class="fa fa-angle-right"></i> {{ application.full_name }}</span>
     </div>
@@ -23,7 +23,7 @@
           <div class="d-flex gap-2 mt-3 mt-md-0">
             <a href="{% url 'admin_application_verify' application.pk %}" class="btn btn-success btn-sm">Verify</a>
             <a href="{% url 'admin_application_cancel' application.pk %}" class="btn btn-warning btn-sm">Cancel</a>
-            <a href="{% url 'admin_application_create_user' application.pk %}" class="btn btn-primary btn-sm">Create Admin User</a>
+            <a href="{% url 'admin_application_create_user' application.pk %}" class="btn btn-primary btn-sm">Create Agent User</a>
             <a href="{% url 'admin_application_delete' application.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
           </div>
         </div>

@@ -41,15 +41,21 @@
             <p class="mb-0"><strong>To Receive:</strong> KSH {{ transaction.amount_to_receive }}</p>
           </div>
 
-          <div class="alert alert-warning">
-            <strong>⏱ 15-Minute Timeout:</strong> After requesting, you'll have 15 minutes for an agent to respond. 
-            If no agent accepts within this time, you can submit a new request.
-          </div>
+          {% if agent_request and not agent_request.is_expired and not agent_request.is_accepted %}
+            <div class="alert alert-warning">
+              <strong>Request already sent.</strong> Expires at {{ agent_request.expires_at|date:"M d, Y H:i" }}. You can retry once it expires.
+            </div>
+          {% else %}
+            <div class="alert alert-warning">
+              <strong>⏱ 15-Minute Timeout:</strong> After requesting, you'll have 15 minutes for an agent to respond.
+              If no agent accepts within this time, you can submit a new request.
+            </div>
+          {% endif %}
 
           <form method="post">
             {% csrf_token %}
             <div class="d-grid gap-2">
-              <button class="btn btn-gold btn-lg" type="submit">Request Agent Now</button>
+              <button class="btn btn-gold btn-lg" type="submit" {% if agent_request and not agent_request.is_expired and not agent_request.is_accepted %}disabled{% endif %}>Request Agent Now</button>
               <a href="{% url 'client_dashboard' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
             </div>
           </form>

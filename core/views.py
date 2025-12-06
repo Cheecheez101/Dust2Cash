@@ -15,10 +15,16 @@ from django.views.generic import TemplateView, ListView, CreateView, UpdateView,
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+from django.utils.crypto import get_random_string
+from django.db import transaction
 
 from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication
 from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm
 from .decorators import agent_required, client_required
+
+
+UserModel = get_user_model()
 
 
 def landing(request):
@@ -144,11 +150,13 @@ def client_dashboard(request):
     agent_online = AgentProfile.objects.filter(is_online=True).exists()
     
     transactions = Transaction.objects.filter(client=profile).order_by('-created_at')
-    
+    requestable_transaction = transactions.filter(status__in=['pending', 'agent_requested']).first()
+
     context = {
         'profile': profile,
         'agent_online': agent_online,
         'transactions': transactions,
+        'requestable_transaction': requestable_transaction,
     }
     return render(request, 'client/dashboard.html', context)
 
@@ -165,23 +173,30 @@ def create_transaction(request):
         return redirect('client_profile')
 
     active_agents = AgentProfile.objects.filter(is_online=True)
-    if not active_agents.exists():
-        messages.warning(request, 'No agent is currently online. Please try again once an agent is available.')
-        return redirect('client_dashboard')
 
     form = TransactionForm(request.POST or None, active_agents=active_agents)
     if request.method == "POST" and form.is_valid():
         transaction = form.save(commit=False)
         transaction.client = profile
         transaction.calculate_amount_to_receive()
-        transaction.agent = form.cleaned_data['agent']
-        transaction.status = 'agent_online'
+        selected_agent = form.cleaned_data.get('agent')
+
+        if selected_agent:
+            transaction.agent = selected_agent
+            transaction.status = 'agent_online'
+        else:
+            transaction.status = 'pending'
         transaction.save()
-        messages.success(
-            request,
-            f'Transaction created! {transaction.agent.user.get_full_name() or transaction.agent.user.username} will assist you.'
-        )
-        return redirect('request_address', transaction_id=transaction.id)
+
+        if selected_agent:
+            messages.success(
+                request,
+                f'Transaction created! {transaction.agent.user.get_full_name() or transaction.agent.user.username} will assist you.'
+            )
+            return redirect('request_address', transaction_id=transaction.id)
+
+        messages.info(request, 'Transaction captured. Request an agent to get assistance when one comes online.')
+        return redirect('request_agent', transaction_id=transaction.id)
 
     return render(request, 'client/create_transaction.html', {
         'form': form,
@@ -192,23 +207,46 @@ def create_transaction(request):
 @login_required
 def request_agent(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id, client=request.user.client_profile)
-    
+
+    if transaction.status not in ['pending', 'agent_requested']:
+        messages.warning(request, 'This transaction is already being handled by an agent.')
+        return redirect('client_dashboard')
+
+    agent_request = getattr(transaction, 'agent_request', None)
+    if agent_request:
+        agent_request.check_expiry()
+
     if request.method == "POST":
+        if agent_request and not agent_request.is_expired and not agent_request.is_accepted:
+            messages.info(request, 'You already have an active agent request. Please wait for a response.')
+            return redirect('client_dashboard')
+
         expires_at = timezone.now() + timedelta(minutes=15)
-        agent_request = AgentRequest.objects.create(
-            transaction=transaction,
-            expires_at=expires_at
-        )
+        if agent_request:
+            agent_request.requested_at = timezone.now()
+            agent_request.expires_at = expires_at
+            agent_request.is_expired = False
+            agent_request.is_accepted = False
+            agent_request.save(update_fields=['requested_at', 'expires_at', 'is_expired', 'is_accepted'])
+        else:
+            agent_request = AgentRequest.objects.create(
+                transaction=transaction,
+                expires_at=expires_at
+            )
+
         transaction.status = 'agent_requested'
         transaction.request_timeout = expires_at
-        transaction.save()
-        
+        transaction.save(update_fields=['status', 'request_timeout'])
+
         send_notification_to_agent(transaction)
-        
+
         messages.success(request, 'Agent request sent! You have 15 minutes to wait for a response.')
         return redirect('client_dashboard')
-    
-    return render(request, 'client/request_agent.html', {'transaction': transaction})
+
+    return render(request, 'client/request_agent.html', {
+        'transaction': transaction,
+        'agent_request': agent_request,
+    })
 
 
 @login_required
@@ -737,10 +775,46 @@ class AdminAgentApplicationDetailView(TemplateView):
 @staff_member_required
 def admin_application_verify(request, pk):
     application = get_object_or_404(AgentApplication, pk=pk)
+    names = application.full_name.split()
+    first_name = names[0]
+    last_name = ' '.join(names[1:]) if len(names) > 1 else ''
+    password = None
+    if not application.created_user:
+        base_username = application.email.split('@')[0]
+        candidate = base_username
+        while UserModel.objects.filter(username=candidate).exists():
+            candidate = f"{base_username}{get_random_string(4)}"
+        password = get_random_string(12)
+        with transaction.atomic():
+            user = UserModel.objects.create_user(
+                username=candidate,
+                email=application.email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=False,
+                is_superuser=False,
+            )
+            AgentProfile.objects.get_or_create(user=user)
+            application.created_user = user
     application.status = AgentApplication.STATUS_VERIFIED
     application.reviewed_by = request.user
     application.reviewed_at = timezone.now()
-    application.save(update_fields=['status', 'reviewed_by', 'reviewed_at'])
+    application.save(update_fields=['status', 'reviewed_by', 'reviewed_at', 'created_user'])
+    if password:
+        send_mail(
+            'Welcome to Dust2Cash Agent Network',
+            (
+                f"Hi {application.full_name},\n\n"
+                f"Your agent application has been approved.\n"
+                f"Username: {application.created_user.username}\n"
+                f"Temporary password: {password}\n\n"
+                "Please log in and update your credentials."
+            ),
+            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@dust2cash.com'),
+            [application.email],
+            fail_silently=True,
+        )
     messages.success(request, 'Application marked as verified.')
     return redirect('admin_application_detail', pk=pk)
 
@@ -777,8 +851,8 @@ class AdminApplicationCreateUserView(FormView):
         user.first_name = self.application.full_name.split(' ')[0]
         user.last_name = ' '.join(self.application.full_name.split(' ')[1:])
         user.email = self.application.email
-        user.is_staff = True
-        user.is_superuser = True
+        user.is_staff = False
+        user.is_superuser = False
         user.save()
         AgentProfile.objects.get_or_create(user=user)
         messages.success(self.request, 'Admin user created and linked to application.')
