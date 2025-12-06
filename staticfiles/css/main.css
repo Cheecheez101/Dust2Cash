@@ -1,0 +1,131 @@
+/* css */
+/* Root CSS variables for theme, spacing and shadows */
+:root {
+  --card-bg: #ffffff;
+  --border: rgba(0,0,0,0.08);
+  --primary: #0b2f3a;
+  --accent: #00d9b4;
+  --accent-700: #00b58f;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --shadow-accent: 0 8px 20px rgba(0,209,180,0.12);
+}
+.header-section {
+ /* css */
+ /* Root CSS variables for theme, spacing and shadows */
+ :root {
+   --card-bg: #1a7af6;
+   --border: rgba(0,0,0,0.08);
+   --primary: #0b2f3a;
+   --accent: #00d9b4;
+   --accent-700: #00b58f;
+   --space-1: 0.5rem;
+   --space-2: 1rem;
+   --radius-sm: 0.25rem;
+   --radius-md: 0.5rem;
+   --shadow-accent: 0 8px 20px rgba(0,209,180,0.12);
+ }
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* ensure header sits above preloader/content */
+  width: 100%;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+
+.header-section .container-fluid,
+.header-section .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: calc(var(--space-1) + 0.25rem) var(--space-2);
+}
+
+/* Logo */
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 800;
+}
+.site-logo img { height: 36px; display: block; }
+
+/* Map main-menu/menu-list to existing main-nav look */
+.main-menu .menu-list,
+.main-menu ul,
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.main-menu .menu-list li a,
+.menu-list li a {
+  color: #333;
+  text-decoration: none;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+.main-menu .menu-list li a:hover,
+.menu-list li a:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+/* Sign-up button in header */
+.site-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-700) 100%);
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-accent);
+  border: 0;
+}
+
+/* small user icon link */
+.user {
+  color: var(--primary);
+  text-decoration: none;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* responsive bar visible on small screens */
+.responsive-bar {
+  display: none;
+  font-size: 1.15rem;
+  cursor: pointer;
+  color: var(--primary);
+}
+@media (max-width: 768px) {
+  .main-menu .menu-list { display: none; }
+  .responsive-bar { display: inline-flex; }
+}
+
+/* Ensure preloader is beneath header once loaded */
+#preloder {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900; /* lower than header (1000) */
+}
+
+/* Small visual polish */
+.header-section .site-btn:focus,
+.header-section .site-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,255,231,0.08); }
