@@ -61,6 +61,15 @@
           <a href="{% url 'admin_applications' %}" class="stretched-link">Review applications</a>
         </div>
       </div>
+      <div class="col">
+        <div class="metric-card">
+          <div class="metric-icon bg-secondary-subtle text-secondary"><i class="fa fa-coins"></i></div>
+          <p class="metric-label">Exchange Rate</p>
+          <p class="metric-value">KSH {{ pricing.exchange_rate }}</p>
+          <a href="{% url 'admin_pricing_settings' %}" class="stretched-link">Edit pricing</a>
+          <p class="text-muted small mb-0">Fee {{ pricing.transaction_fee_percent }}%</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>

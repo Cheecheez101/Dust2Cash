@@ -64,8 +64,8 @@
       <div class="card shadow-sm border-0">
         <div class="card-body p-4">
           <h6 class="text-muted">Exchange Rate</h6>
-          <p class="fs-4 fw-bold mb-0">1 USDT = KSH 100</p>
-          <small class="text-muted">Transaction fee included</small>
+          <p class="fs-4 fw-bold mb-0">1 USDT = KSH {{ pricing.exchange_rate }}</p>
+          <small class="text-muted">Transaction fee {{ pricing.transaction_fee_percent }}%</small>
         </div>
       </div>
     </div>

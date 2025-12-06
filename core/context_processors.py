@@ -1,14 +1,18 @@
 # core/context_processors.py
+from .models import PricingSettings
+from django.utils import timezone
+
 
 def dust2cash_settings(request):
+    pricing = PricingSettings.get_solo()
     return {
         'settings': {
-            'buying_rate_per_usdt': 100.00,
-            'transaction_fee_percent': 1.50,
+            'buying_rate_per_usdt': float(pricing.exchange_rate),
+            'transaction_fee_percent': float(pricing.transaction_fee_percent),
             'min_trade_amount_usdt': 5.00,
         },
         'now': {
-            'year': 2025  # you can replace with datetime.now().year
+            'year': timezone.now().year if hasattr(timezone, 'now') else 2025
         }
     }
 

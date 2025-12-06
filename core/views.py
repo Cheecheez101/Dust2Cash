@@ -19,8 +19,8 @@ from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from django.db import transaction
 
-from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication
-from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm
+from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication, PricingSettings
+from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
 from .decorators import agent_required, client_required
 
 
@@ -152,11 +152,13 @@ def client_dashboard(request):
     transactions = Transaction.objects.filter(client=profile).order_by('-created_at')
     requestable_transaction = transactions.filter(status__in=['pending', 'agent_requested']).first()
 
+    pricing = PricingSettings.get_solo()
     context = {
         'profile': profile,
         'agent_online': agent_online,
         'transactions': transactions,
         'requestable_transaction': requestable_transaction,
+        'pricing': pricing,
     }
     return render(request, 'client/dashboard.html', context)
 
@@ -175,9 +177,13 @@ def create_transaction(request):
     active_agents = AgentProfile.objects.filter(is_online=True)
 
     form = TransactionForm(request.POST or None, active_agents=active_agents)
+    pricing = PricingSettings.get_solo()
     if request.method == "POST" and form.is_valid():
         transaction = form.save(commit=False)
         transaction.client = profile
+        transaction.exchange_rate = pricing.exchange_rate
+        fee_percent = pricing.transaction_fee_percent / Decimal('100')
+        transaction.transaction_fee = transaction.amount * fee_percent * Decimal(pricing.exchange_rate)
         transaction.calculate_amount_to_receive()
         selected_agent = form.cleaned_data.get('agent')
 
@@ -201,6 +207,7 @@ def create_transaction(request):
     return render(request, 'client/create_transaction.html', {
         'form': form,
         'active_agents': active_agents,
+        'pricing': pricing,
     })
 
 
@@ -534,6 +541,7 @@ class AdminDashboardView(TemplateView):
             'transaction_count': Transaction.objects.count(),
             'reports_count': Transaction.objects.count(),
             'application_count': AgentApplication.objects.filter(status=AgentApplication.STATUS_PENDING).count(),
+            'pricing': PricingSettings.get_solo(),
         })
         return context
 
@@ -862,3 +870,18 @@ class AdminApplicationCreateUserView(FormView):
         context = super().get_context_data(**kwargs)
         context['application'] = self.application
         return context
+
+
+@login_required
+@staff_member_required
+def admin_pricing_settings(request):
+    pricing = PricingSettings.get_solo()
+    form = PricingSettingsForm(request.POST or None, instance=pricing)
+    if request.method == "POST" and form.is_valid():
+        updated_pricing = form.save(commit=False)
+        if request.user.is_authenticated:
+            updated_pricing.updated_by = request.user
+        updated_pricing.save()
+        messages.success(request, 'Pricing settings updated successfully.')
+        return redirect('admin_pricing_settings')
+    return render(request, 'admin/pricing_settings.html', {'form': form, 'pricing': pricing})

@@ -44,6 +44,7 @@ urlpatterns = [
     path('console/reports/agents.csv', views.export_agents_csv, name='export_agents_csv'),
     path('console/reports/transactions.csv', views.export_transactions_csv, name='export_transactions_csv'),
     path('agents/apply/', views.apply_agent, name='apply_agent'),
+    path('console/pricing/', views.admin_pricing_settings, name='admin_pricing_settings'),
 
     path('console/applications/', views.AdminAgentApplicationListView.as_view(), name='admin_applications'),
     path('console/application/<int:pk>/', views.AdminAgentApplicationDetailView.as_view(), name='admin_application_detail'),

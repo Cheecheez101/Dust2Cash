@@ -48,6 +48,29 @@ class AgentProfile(models.Model):
         return f"Agent: {self.user.username}"
 
 
+class PricingSettings(models.Model):
+    exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('100.00'))
+    transaction_fee_percent = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('1.50'))
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pricing_settings_updates'
+    )
+
+    def __str__(self):
+        return f"Pricing @ {self.exchange_rate} KSH/USDT ({self.transaction_fee_percent}% fee)"
+
+    @classmethod
+    def get_solo(cls):
+        instance = cls.objects.first()
+        if instance:
+            return instance
+        return cls.objects.create()
+
+
 class Transaction(models.Model):
     PLATFORM_CHOICES = [
         ('binance', 'Binance'),

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import ClientProfile, Transaction, AgentProfile, AgentApplication
+from .models import ClientProfile, Transaction, AgentProfile, AgentApplication, PricingSettings
 
 
 class LoginForm(forms.Form):
@@ -109,4 +109,14 @@ class AgentApplicationForm(forms.ModelForm):
             'has_aml_policy': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'accepts_background_check': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'terms_acknowledged': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class PricingSettingsForm(forms.ModelForm):
+    class Meta:
+        model = PricingSettings
+        fields = ['exchange_rate', 'transaction_fee_percent']
+        widgets = {
+            'exchange_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'transaction_fee_percent': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }

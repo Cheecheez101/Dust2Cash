@@ -1,13 +1,15 @@
 import os
 import importlib.util
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security / environment-friendly defaults
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
-DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes') #false for production
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'dust2cash.onrender.com,.vercel.app').split(',')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,12 +62,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dust2cash.wsgi.application'
+# ------------uncomment for local use---------------#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL')
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -110,3 +119,6 @@ LOGGING = {
   'root': {'handlers': ['console'], 'level': 'INFO'},
 }
 logging.getLogger().info('settings loaded, DEBUG=%s', DEBUG)
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://dust2cash.onrender.com,https://*.vercel.app').split(',')
