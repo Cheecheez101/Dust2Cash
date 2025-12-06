@@ -11,11 +11,6 @@
 /* Template default CSS
 /*----------------------------------------*/
 
-@font-face {
-	font-family: 'Futura';
-	src: url("../fonts/Futura.woff");
-}
-
 html,
 body {
 	height: 100%;
