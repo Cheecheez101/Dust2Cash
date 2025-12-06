@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security / environment-friendly defaults
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes') #false for production
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'dust2cash.onrender.com,.vercel.app').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'dust2cash-b8e6.onrender.com,.vercel.app').split(',')
 
 
 INSTALLED_APPS = [
