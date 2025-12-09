@@ -52,4 +52,8 @@ urlpatterns = [
     path('console/application/<int:pk>/cancel/', views.admin_application_cancel, name='admin_application_cancel'),
     path('console/application/<int:pk>/delete/', views.AdminAgentApplicationDeleteView.as_view(), name='admin_application_delete'),
     path('console/application/<int:pk>/create-user/', views.AdminApplicationCreateUserView.as_view(), name='admin_application_create_user'),
+
+    # New profile/password routes
+    path('agent/profile/', views.agent_profile, name='agent_profile'),
+    path('accounts/password/change/', views.change_password, name='change_password'),
 ]

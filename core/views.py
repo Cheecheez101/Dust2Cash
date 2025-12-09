@@ -18,13 +18,31 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from django.db import transaction
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
-from .models import ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication, PricingSettings
-from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
 from .decorators import agent_required, client_required
+from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
 
+# Lazy-model loader to avoid importing Django models at module import time
+_models_loaded = False
+ClientProfile = AgentProfile = Transaction = AgentRequest = AdminProfile = AgentApplication = PricingSettings = None
 
-UserModel = get_user_model()
+def ensure_models_loaded():
+    """Import models when first needed to avoid AppRegistryNotReady during module import."""
+    global _models_loaded, ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication, PricingSettings
+    if _models_loaded:
+        return
+    from . import models as _models
+    ClientProfile = _models.ClientProfile
+    AgentProfile = _models.AgentProfile
+    Transaction = _models.Transaction
+    AgentRequest = _models.AgentRequest
+    AdminProfile = _models.AdminProfile
+    AgentApplication = _models.AgentApplication
+    PricingSettings = _models.PricingSettings
+    _models_loaded = True
+
 
 
 def landing(request):
@@ -32,6 +50,7 @@ def landing(request):
 
 
 def about_page(request):
+    ensure_models_loaded()
     active_agents = AgentProfile.objects.filter(is_online=True).select_related('user').order_by('user__first_name')
     return render(request, 'about.html', {'active_agents': active_agents})
 
@@ -63,6 +82,7 @@ def redirect_user_by_role(user):
 
 
 def login_view(request):
+    ensure_models_loaded()
     if request.user.is_authenticated:
         return redirect_user_by_role(request.user)
 
@@ -80,6 +100,7 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, 'Welcome back!')
                 if user.is_staff:
+                    ensure_models_loaded()
                     AdminProfile.objects.get_or_create(user=user)
                 return redirect_user_by_role(user)
             else:
@@ -91,6 +112,7 @@ def login_view(request):
 
 
 def signup_view(request):
+    ensure_models_loaded()
     if request.user.is_authenticated:
         return redirect_user_by_role(request.user)
 
@@ -122,6 +144,7 @@ def logout_view(request):
 
 @login_required
 def client_profile(request):
+    ensure_models_loaded()
     try:
         profile = request.user.client_profile
     except ClientProfile.DoesNotExist:
@@ -138,6 +161,7 @@ def client_profile(request):
 
 @login_required
 def client_dashboard(request):
+    ensure_models_loaded()
     try:
         profile = request.user.client_profile
         if not profile.is_complete():
@@ -165,6 +189,7 @@ def client_dashboard(request):
 
 @login_required
 def create_transaction(request):
+    ensure_models_loaded()
     try:
         profile = request.user.client_profile
         if not profile.is_complete():
@@ -213,6 +238,7 @@ def create_transaction(request):
 
 @login_required
 def request_agent(request, transaction_id):
+    ensure_models_loaded()
     transaction = get_object_or_404(Transaction, id=transaction_id, client=request.user.client_profile)
 
     if transaction.status not in ['pending', 'agent_requested']:
@@ -258,6 +284,7 @@ def request_agent(request, transaction_id):
 
 @login_required
 def request_address(request, transaction_id):
+    ensure_models_loaded()
     transaction = get_object_or_404(Transaction, id=transaction_id, client=request.user.client_profile)
     
     if transaction.status == 'pending' or transaction.status == 'agent_requested':
@@ -269,6 +296,7 @@ def request_address(request, transaction_id):
 
 @agent_required
 def agent_portal(request):
+    ensure_models_loaded()
     agent = request.user.agent_profile
     
     if request.method == "POST":
@@ -307,6 +335,7 @@ def agent_portal(request):
 
 @agent_required
 def agent_accept_request(request, request_id):
+    ensure_models_loaded()
     agent = request.user.agent_profile
     agent_request = get_object_or_404(AgentRequest, id=request_id)
     
@@ -330,6 +359,7 @@ def agent_accept_request(request, request_id):
 
 @agent_required
 def agent_provide_address(request, transaction_id):
+    ensure_models_loaded()
     agent = request.user.agent_profile
     transaction = get_object_or_404(Transaction, id=transaction_id, agent=agent)
     
@@ -347,6 +377,7 @@ def agent_provide_address(request, transaction_id):
 
 @agent_required
 def agent_confirm_receipt(request, transaction_id):
+    ensure_models_loaded()
     agent = request.user.agent_profile
     transaction = get_object_or_404(Transaction, id=transaction_id, agent=agent)
     
@@ -361,6 +392,7 @@ def agent_confirm_receipt(request, transaction_id):
 
 @agent_required
 def agent_send_payment(request, transaction_id):
+    ensure_models_loaded()
     agent = request.user.agent_profile
     transaction = get_object_or_404(Transaction, id=transaction_id, agent=agent)
     
@@ -534,6 +566,7 @@ class AdminDashboardView(TemplateView):
     template_name = 'admin/dashboard.html'
 
     def get_context_data(self, **kwargs):
+        ensure_models_loaded()
         context = super().get_context_data(**kwargs)
         context.update({
             'client_count': ClientProfile.objects.count(),
@@ -546,19 +579,28 @@ class AdminDashboardView(TemplateView):
         return context
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminClientListView(ListView):
-    model = ClientProfile
     template_name = 'admin/clients_list.html'
     context_object_name = 'clients'
 
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = ClientProfile
+        return super().dispatch(request, *args, **kwargs)
 
-@method_decorator(staff_member_required, name='dispatch')
+    def get_queryset(self):
+        return self.model.objects.all()
+
+
 class AdminClientCreateView(CreateView):
-    model = ClientProfile
-    fields = ['first_name', 'last_name', 'phone_number', 'email']
     template_name = 'admin/client_form.html'
     success_url = reverse_lazy('admin_clients')
+    fields = ['first_name', 'last_name', 'phone_number', 'email']
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = ClientProfile
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         email = form.cleaned_data['email']
@@ -577,12 +619,15 @@ class AdminClientCreateView(CreateView):
         return super().form_valid(form)
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminClientUpdateView(UpdateView):
-    model = ClientProfile
-    fields = ['first_name', 'last_name', 'phone_number', 'email']
     template_name = 'admin/client_form.html'
     success_url = reverse_lazy('admin_clients')
+    fields = ['first_name', 'last_name', 'phone_number', 'email']
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = ClientProfile
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -593,11 +638,14 @@ class AdminClientUpdateView(UpdateView):
         return response
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminClientDeleteView(DeleteView):
-    model = ClientProfile
     template_name = 'admin/client_confirm_delete.html'
     success_url = reverse_lazy('admin_clients')
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = ClientProfile
+        return super().dispatch(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -608,19 +656,28 @@ class AdminClientDeleteView(DeleteView):
         return response
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminAgentListView(ListView):
-    model = AgentProfile
     template_name = 'admin/agents_list.html'
     context_object_name = 'agents'
 
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentProfile
+        return super().dispatch(request, *args, **kwargs)
 
-@method_decorator(staff_member_required, name='dispatch')
+    def get_queryset(self):
+        return self.model.objects.all()
+
+
 class AdminAgentCreateView(CreateView):
-    model = AgentProfile
-    fields = ['user', 'is_online']
     template_name = 'admin/agent_form.html'
     success_url = reverse_lazy('admin_agents')
+    fields = ['user', 'is_online']
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentProfile
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -628,12 +685,15 @@ class AdminAgentCreateView(CreateView):
         return form
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminAgentUpdateView(UpdateView):
-    model = AgentProfile
-    fields = ['is_online']
     template_name = 'admin/agent_form.html'
     success_url = reverse_lazy('admin_agents')
+    fields = ['is_online']
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentProfile
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -641,41 +701,56 @@ class AdminAgentUpdateView(UpdateView):
         return form
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminAgentDeleteView(DeleteView):
-    model = AgentProfile
     template_name = 'admin/agent_confirm_delete.html'
     success_url = reverse_lazy('admin_agents')
 
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentProfile
+        return super().dispatch(request, *args, **kwargs)
 
-@method_decorator(staff_member_required, name='dispatch')
+
 class AdminTransactionListView(ListView):
-    model = Transaction
     template_name = 'admin/transactions_list.html'
     context_object_name = 'transactions'
     ordering = ['-created_at']
 
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = Transaction
+        return super().dispatch(request, *args, **kwargs)
 
-@method_decorator(staff_member_required, name='dispatch')
+    def get_queryset(self):
+        return self.model.objects.order_by('-created_at')
+
+
 class AdminTransactionUpdateView(UpdateView):
-    model = Transaction
-    fields = ['status', 'exchange_rate', 'transaction_fee', 'amount_to_receive']
     template_name = 'admin/transaction_form.html'
     success_url = reverse_lazy('admin_transactions')
+    fields = ['status', 'exchange_rate', 'transaction_fee', 'amount_to_receive']
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = Transaction
+        return super().dispatch(request, *args, **kwargs)
 
 
-@method_decorator(staff_member_required, name='dispatch')
 class AdminTransactionDeleteView(DeleteView):
-    model = Transaction
     template_name = 'admin/transaction_confirm_delete.html'
     success_url = reverse_lazy('admin_transactions')
 
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = Transaction
+        return super().dispatch(request, *args, **kwargs)
 
-@method_decorator(staff_member_required, name='dispatch')
+
 class AdminReportsView(TemplateView):
     template_name = 'admin/reports.html'
 
     def get_context_data(self, **kwargs):
+        ensure_models_loaded()
         context = super().get_context_data(**kwargs)
         clients = ClientProfile.objects.select_related('user').order_by('-created_at')[:25]
         agents = AgentProfile.objects.select_related('user').order_by('-last_online')[:25]
@@ -698,6 +773,78 @@ class AdminReportsView(TemplateView):
             }
         })
         return context
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentApplicationListView(ListView):
+    template_name = 'admin/applications_list.html'
+    context_object_name = 'applications'
+    paginate_by = 25
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentApplication
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = self.model.objects.all()
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        return qs
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminAgentApplicationDeleteView(DeleteView):
+    template_name = 'admin/application_confirm_delete.html'
+    success_url = reverse_lazy('admin_applications')
+
+    def dispatch(self, request, *args, **kwargs):
+        ensure_models_loaded()
+        self.model = AgentApplication
+        return super().dispatch(request, *args, **kwargs)
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminApplicationCreateUserView(FormView):
+    template_name = 'admin/application_create_user.html'
+    form_class = UserCreationForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.application = get_object_or_404(AgentApplication, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.first_name = self.application.full_name.split(' ')[0]
+        user.last_name = ' '.join(self.application.full_name.split(' ')[1:])
+        user.email = self.application.email
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
+        AgentProfile.objects.get_or_create(user=user)
+        messages.success(self.request, 'Admin user created and linked to application.')
+        return redirect('admin_application_detail', pk=self.application.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['application'] = self.application
+        return context
+
+
+@login_required
+@staff_member_required
+def admin_pricing_settings(request):
+    pricing = PricingSettings.get_solo()
+    form = PricingSettingsForm(request.POST or None, instance=pricing)
+    if request.method == "POST" and form.is_valid():
+        updated_pricing = form.save(commit=False)
+        if request.user.is_authenticated:
+            updated_pricing.updated_by = request.user
+        updated_pricing.save()
+        messages.success(request, 'Pricing settings updated successfully.')
+        return redirect('admin_pricing_settings')
+    return render(request, 'admin/pricing_settings.html', {'form': form, 'pricing': pricing})
 
 
 @staff_member_required
@@ -746,21 +893,6 @@ def apply_agent(request):
 
 
 @method_decorator(staff_member_required, name='dispatch')
-class AdminAgentApplicationListView(ListView):
-    model = AgentApplication
-    template_name = 'admin/applications_list.html'
-    context_object_name = 'applications'
-    paginate_by = 25
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        status_filter = self.request.GET.get('status')
-        if status_filter:
-            qs = qs.filter(status=status_filter)
-        return qs
-
-
-@method_decorator(staff_member_required, name='dispatch')
 class AdminAgentApplicationDetailView(TemplateView):
     template_name = 'admin/application_detail.html'
 
@@ -782,6 +914,7 @@ class AdminAgentApplicationDetailView(TemplateView):
 
 @staff_member_required
 def admin_application_verify(request, pk):
+    ensure_models_loaded()
     application = get_object_or_404(AgentApplication, pk=pk)
     names = application.full_name.split()
     first_name = names[0]
@@ -790,6 +923,7 @@ def admin_application_verify(request, pk):
     if not application.created_user:
         base_username = application.email.split('@')[0]
         candidate = base_username
+        UserModel = get_user_model()
         while UserModel.objects.filter(username=candidate).exists():
             candidate = f"{base_username}{get_random_string(4)}"
         password = get_random_string(12)
@@ -840,48 +974,58 @@ def admin_application_cancel(request, pk):
 
 @method_decorator(staff_member_required, name='dispatch')
 class AdminAgentApplicationDeleteView(DeleteView):
-    model = AgentApplication
     template_name = 'admin/application_confirm_delete.html'
     success_url = reverse_lazy('admin_applications')
 
-
-@method_decorator(staff_member_required, name='dispatch')
-class AdminApplicationCreateUserView(FormView):
-    template_name = 'admin/application_create_user.html'
-    form_class = UserCreationForm
-
     def dispatch(self, request, *args, **kwargs):
-        self.application = get_object_or_404(AgentApplication, pk=kwargs['pk'])
+        ensure_models_loaded()
+        self.model = AgentApplication
         return super().dispatch(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        user = form.save(commit=False)
-        user.first_name = self.application.full_name.split(' ')[0]
-        user.last_name = ' '.join(self.application.full_name.split(' ')[1:])
-        user.email = self.application.email
-        user.is_staff = False
-        user.is_superuser = False
-        user.save()
-        AgentProfile.objects.get_or_create(user=user)
-        messages.success(self.request, 'Admin user created and linked to application.')
-        return redirect('admin_application_detail', pk=self.application.pk)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['application'] = self.application
-        return context
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Logged out successfully')
+    return redirect('landing')
 
 
 @login_required
-@staff_member_required
-def admin_pricing_settings(request):
-    pricing = PricingSettings.get_solo()
-    form = PricingSettingsForm(request.POST or None, instance=pricing)
-    if request.method == "POST" and form.is_valid():
-        updated_pricing = form.save(commit=False)
-        if request.user.is_authenticated:
-            updated_pricing.updated_by = request.user
-        updated_pricing.save()
-        messages.success(request, 'Pricing settings updated successfully.')
-        return redirect('admin_pricing_settings')
-    return render(request, 'admin/pricing_settings.html', {'form': form, 'pricing': pricing})
+@agent_required
+def agent_profile(request):
+    ensure_models_loaded()
+    user = request.user
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        user.first_name = first_name
+        user.last_name = last_name
+        if email:
+            user.email = email
+        user.save()
+        messages.success(request, 'Profile updated successfully.')
+        return redirect('agent_portal')
+
+    context = {
+        'agent': getattr(request.user, 'agent_profile', None),
+        'user': user,
+    }
+    return render(request, 'agent/edit_profile.html', context)
+
+
+@login_required
+def change_password(request):
+    ensure_models_loaded()
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was updated successfully.')
+            next_url = request.POST.get('next') or request.GET.get('next') or (request.user.agent_profile and reverse_lazy('agent_portal')) or reverse_lazy('client_dashboard')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'auth/change_password.html', {'form': form})

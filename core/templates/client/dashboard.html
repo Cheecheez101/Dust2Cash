@@ -10,18 +10,7 @@
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
-      <span class="brand-title">Dust2Cash</span>
-    </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'client_profile' %}">Profile</a>
-      <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
-    </div>
-  </div>
-</nav>
+{% include 'base_nav_client.html' %}
 
 <main class="container py-5">
   <h2 class="mb-4">Welcome, {{ profile.first_name }}!</h2>

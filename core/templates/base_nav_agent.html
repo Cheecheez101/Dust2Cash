@@ -1,0 +1,17 @@
+{% load static %}
+<nav class="navbar navbar-light bg-white shadow-sm mb-4">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash" style="height:36px; margin-right:8px;">
+      <span class="brand-title">Dust2Cash</span>
+    </a>
+    <div class="d-flex gap-2 align-items-center">
+      <span class="me-2">Signed in as <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
+      <a class="btn btn-outline-dark btn-sm" href="{% url 'agent_portal' %}">Portal</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'agent_profile' %}">Edit Profile</a>
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'change_password' %}">Change Password</a>
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
+

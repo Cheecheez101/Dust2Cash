@@ -1,0 +1,20 @@
+{% comment %} Expects `transaction` in context. Shows progress steps based on transaction.status {% endcomment %}
+{% load static %}
+<div class="transaction-progress mb-4">
+  {% with steps=['pending','agent_requested','agent_online','address_provided','crypto_received','payment_sent','completed'] labels=['Captured','Agent Requested','Agent Assigned','Address Provided','Crypto Received','Payment Sent','Completed'] %}
+    <div class="d-flex gap-2 align-items-center">
+      {% for s in steps %}
+        {% with label=labels|slice:forloop.counter0|stringformat:"s" %}
+          {% if transaction.status == s %}
+            <div class="p-2 px-3 bg-primary text-white rounded">{{ labels|index:forloop.counter0 }}</div>
+          {% elif forloop.counter0 < steps.index(transaction.status)|default:-1 %}
+            <div class="p-2 px-3 bg-success text-white rounded">{{ labels|index:forloop.counter0 }}</div>
+          {% else %}
+            <div class="p-2 px-3 bg-light text-dark rounded">{{ labels|index:forloop.counter0 }}</div>
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% endwith %}
+</div>
+
