@@ -16,11 +16,11 @@
   <link rel="stylesheet" href="{% static 'css/owl.carousel.css' %}"/>
 <!--  <link rel="stylesheet" href="{% static 'css/style.css' %}"/>-->
 
-
-
-
-
-{% block extra_head %}{% endblock %}
+<!-- Inline fallback styles for critical buttons to ensure visibility if external CSS hasn't loaded -->
+<style>
+  .btn-gold { display:inline-block; padding:.5rem 1rem; background:linear-gradient(180deg,#f6b042,#f19a2f); color:#111; border:1px solid rgba(0,0,0,0.12); border-radius:.5rem; font-weight:700; text-decoration:none; }
+  .btn { border-radius:.5rem; }
+</style>
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <div id="preloder">
