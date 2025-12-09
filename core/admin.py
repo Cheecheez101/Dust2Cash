@@ -18,7 +18,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
 
 @admin.register(AgentProfile)
 class AgentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_online', 'last_online')
+    list_display = ('user', 'is_online', 'last_online', 'phone_number', 'email', 'created_at')
     list_filter = ('is_online',)
     actions = ['make_online', 'make_offline']
     

@@ -372,7 +372,7 @@ def agent_provide_address(request, transaction_id):
             messages.success(request, 'Address provided to client')
             return redirect('agent_portal')
     
-    return render(request, 'agent/provide_address.html', {'transaction': transaction})
+    return render(request, 'agent/provide_address.html', {'transaction': transaction, 'agent': agent})
 
 
 @agent_required
@@ -387,7 +387,7 @@ def agent_confirm_receipt(request, transaction_id):
         messages.success(request, 'Crypto receipt confirmed. Please send payment now.')
         return redirect('agent_send_payment', transaction_id=transaction.id)
     
-    return render(request, 'agent/confirm_receipt.html', {'transaction': transaction})
+    return render(request, 'agent/confirm_receipt.html', {'transaction': transaction, 'agent': agent})
 
 
 @agent_required
@@ -405,7 +405,7 @@ def agent_send_payment(request, transaction_id):
         messages.success(request, 'Payment marked as sent!')
         return redirect('agent_portal')
     
-    return render(request, 'agent/send_payment.html', {'transaction': transaction})
+    return render(request, 'agent/send_payment.html', {'transaction': transaction, 'agent': agent})
 
 
 def send_notification_to_agent(transaction):
@@ -1029,3 +1029,31 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'auth/change_password.html', {'form': form})
+
+
+@login_required
+def client_interactions(request):
+    ensure_models_loaded()
+    profile = request.user.client_profile
+    pending_requests = getattr(profile, 'pending_requests', [])
+    conversations = []
+    context = {
+        'pending_requests': pending_requests,
+        'conversations': conversations,
+    }
+    return render(request, 'client/interactions.html', context)
+
+
+@login_required
+@agent_required
+def agent_interactions(request):
+    ensure_models_loaded()
+    agent = request.user.agent_profile
+    waiting_clients = []
+    conversations = []
+    context = {
+        'waiting_clients': waiting_clients,
+        'conversations': conversations,
+        'agent': agent,
+    }
+    return render(request, 'agent/interactions.html', context)

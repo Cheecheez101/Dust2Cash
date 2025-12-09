@@ -1,35 +1,51 @@
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
-  <link href="/static/css/main.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
-  <link rel="icon" href="{% static 'img/favicon.png' %}">
-<body class="bg-light">
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-<!--      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">-->
-      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash" style="height:36px; margin-right:8px;">
+{% block title %}Login · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Unified login</div>
+      </div>
     </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark" href="{% url 'signup' %}">Sign Up</a>
+    <div class="nav-actions">
+      <a class="nav-pill nav-pill--ghost" href="{% url 'signup' %}">Sign Up</a>
     </div>
   </div>
 </nav>
 
-<div class="container py-5">
+<main class="container py-5">
   <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <section class="dashboard-grid mb-4">
+        <div class="stat-card">
+          <div class="stat-label">Unified access</div>
+          <div class="stat-value fs-4">Clients · Agents · Admins</div>
+          <small class="text-muted">All log in here</small>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Support</div>
+          <div class="stat-value fs-5">support@dust2cash.com</div>
+          <small class="text-muted">Need help?</small>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">New user?</div>
+          <div class="stat-value fs-4">Sign up free</div>
+          <small class="text-muted">Takes 2 minutes</small>
+        </div>
+      </section>
+    </div>
     <div class="col-md-6 col-lg-5">
       <div class="card shadow-sm border-0">
         <div class="card-body p-4">
-          <h2 class="card-title text-center mb-4">Login to Dust2Cash</h2>
-          
+          <h2 class="text-center mb-4">Login to Dust2Cash</h2>
+
           {% if messages %}
             {% for message in messages %}
               <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -38,46 +54,39 @@
               </div>
             {% endfor %}
           {% endif %}
-          
-          <form method="post">
+
+          <form method="post" novalidate>
             {% csrf_token %}
             <div class="mb-3">
-              <label for="{{ form.identifier.id_for_label }}" class="form-label">Email or Username</label>
+              <label class="form-label">Email or Username</label>
               {{ form.identifier }}
-              {% if form.identifier.errors %}
-                <div class="text-danger small">{{ form.identifier.errors }}</div>
-              {% endif %}
+              {% if form.identifier.errors %}<div class="text-danger small">{{ form.identifier.errors }}</div>{% endif %}
             </div>
-            
             <div class="mb-3">
-              <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+              <label class="form-label">Password</label>
               <div class="input-group">
                 {{ form.password }}
-                <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle password visibility" title="Show/hide password">
+                <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle password visibility">
                   <i class="fa fa-eye" id="togglePasswordIcon" aria-hidden="true"></i>
                 </button>
               </div>
-               {% if form.password.errors %}
-                 <div class="text-danger small">{{ form.password.errors }}</div>
-               {% endif %}
-             </div>
-
-            <p class="text-muted small mb-3">Clients, agents, and admins all log in here using the same credentials.</p>
+              {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors }}</div>{% endif %}
+            </div>
+            <p class="text-muted small mb-3">Clients, agents, and admins all log in here.</p>
             <button type="submit" class="btn btn-gold w-100">Login</button>
           </form>
-          
+
           <hr class="my-4">
-          
-          <p class="text-center mb-0">
-            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
-          </p>
+          <p class="text-center mb-0">Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
         </div>
       </div>
     </div>
   </div>
-</div>
+</main>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}
+{{ block.super }}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var pwd = document.getElementById('{{ form.password.id_for_label }}');
@@ -100,5 +109,4 @@
     }
   });
 </script>
-</body>
-</html>
+{% endblock %}

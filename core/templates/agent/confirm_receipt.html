@@ -1,88 +1,117 @@
+{% extends 'base.html' %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Confirm Crypto Receipt - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-<nav class="navbar navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
-      <span class="brand-title">Dust2Cash Agent Portal</span>
+{% block title %}Confirm Crypto Receipt · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Agent console</div>
+      </div>
     </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'agent_portal' %}">Back to Portal</a>
+    <div class="nav-actions">
+      {% if agent %}
+      <span class="status-pill {% if agent.is_online %}success{% else %}warning{% endif %}">
+        {% if agent.is_online %}Online{% else %}Offline{% endif %}
+      </span>
+      {% endif %}
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_portal' %}">Portal</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
     </div>
   </div>
 </nav>
 
-<main class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-5">
-          <h2 class="mb-3">Confirm Crypto Receipt</h2>
-          
-          <div class="card bg-light border-0 p-3 mb-4">
-            <h6 class="mb-2">Transaction Details</h6>
-            <p class="mb-1"><strong>Client:</strong> {{ transaction.client }}</p>
-            <p class="mb-1"><strong>Platform:</strong> {{ transaction.get_platform_display }}</p>
-            <p class="mb-1"><strong>Expected Amount:</strong> {{ transaction.amount }} {{ transaction.get_currency_display }}</p>
-            <p class="mb-1"><strong>Transfer Address:</strong> <code>{{ transaction.transfer_address }}</code></p>
-            <p class="mb-0"><strong>To Pay Client:</strong> KSH {{ transaction.amount_to_receive }}</p>
-          </div>
+<main class="dashboard-shell py-4">
+  <section class="card-bleed mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-start">
+      <div>
+        <div class="hero-title">Confirm Crypto Receipt</div>
+        <p class="hero-subtitle">Only proceed once {{ transaction.amount }} {{ transaction.get_currency_display }} has arrived at your wallet.</p>
+      </div>
+      <a class="btn btn-outline-light" href="{% url 'agent_portal' %}">Back to Portal</a>
+    </div>
+  </section>
 
-          <div class="alert alert-info mb-4">
-            <strong>Instructions:</strong>
-            <ol class="mb-0 mt-2">
-              <li>Check your {{ transaction.get_platform_display }} wallet</li>
-              <li>Verify you received exactly {{ transaction.amount }} {{ transaction.get_currency_display }}</li>
-              <li>Confirm the transaction came from the correct source</li>
-              <li>Only confirm if the crypto has been received</li>
-            </ol>
-          </div>
+  <section class="dashboard-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-label">Client</div>
+      <div class="stat-value fs-4">{{ transaction.client }}</div>
+      <small class="text-muted">Pending payout</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Platform</div>
+      <div class="stat-value fs-4">{{ transaction.get_platform_display }}</div>
+      <small class="text-muted">{{ transaction.get_currency_display }} wallet</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Expected amount</div>
+      <div class="stat-value fs-4">{{ transaction.amount }} {{ transaction.get_currency_display }}</div>
+      <small class="text-muted">Awaiting confirmation</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Client payout</div>
+      <div class="stat-value fs-4">KSH {{ transaction.amount_to_receive }}</div>
+      <small class="text-muted">{{ transaction.get_payment_method_display }}</small>
+    </div>
+  </section>
 
-          <form method="post">
-            {% csrf_token %}
-            
-            <div class="alert alert-warning">
-              <strong>⚠️ Warning:</strong> Only confirm if you have received the crypto. Once confirmed, you'll proceed to send the M-Pesa/Airtel payment.
-            </div>
-
-            <div class="d-grid gap-2">
-              <button class="btn btn-success btn-lg" type="submit">✓ Confirm Crypto Received</button>
-              <a href="{% url 'agent_portal' %}" class="btn btn-outline-secondary">Not Yet Received</a>
-            </div>
-          </form>
+  <section class="dashboard-card">
+    <div class="section-heading">
+      <h5>Transaction Details</h5>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Client</strong>
+          <p class="mb-0">{{ transaction.client }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Platform</strong>
+          <p class="mb-0">{{ transaction.get_platform_display }} · {{ transaction.get_currency_display }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Expected Amount</strong>
+          <p class="mb-0">{{ transaction.amount }} {{ transaction.get_currency_display }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Transfer Address</strong>
+          <p class="mb-0 font-monospace">{{ transaction.transfer_address }}</p>
         </div>
       </div>
     </div>
-  </div>
+
+    <div class="alert alert-info mb-4">
+      <strong>Checklist before confirming:</strong>
+      <ol class="mb-0 mt-2">
+        <li>Funds received in {{ transaction.get_platform_display }} wallet.</li>
+        <li>Amount matches {{ transaction.amount }} {{ transaction.get_currency_display }}.</li>
+        <li>Sender matches the client's account.</li>
+      </ol>
+    </div>
+
+    <form method="post" class="d-grid gap-3">
+      {% csrf_token %}
+      <div class="alert alert-warning">
+        Confirming will prompt the payout step. Only proceed if crypto is firmly in your custody.
+      </div>
+      <div class="d-grid gap-2">
+        <button class="btn btn-success" type="submit">✓ Confirm Crypto Received</button>
+        <a href="{% url 'agent_portal' %}" class="btn btn-outline-secondary">Not Yet Received</a>
+      </div>
+    </form>
+  </section>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  window.chatwootSettings = {"position":"right","type":"standard","launcherTitle":"Chat with us"};
-  (function(d,t) {
-    var BASE_URL="https://app.chatwoot.com";
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=BASE_URL+"/packs/js/sdk.js";
-    g.async = true;
-    s.parentNode.insertBefore(g,s);
-    g.onload=function(){
-      window.chatwootSDK.run({
-        websiteToken: 'RYRXUpMGqFPFwnxkh5hYvrQF',
-        baseUrl: BASE_URL
-      })
-    }
-  })(document,"script");
-</script>
-
-</body>
-</html>
+{% endblock %}

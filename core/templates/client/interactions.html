@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Client Interactions · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Client workspace</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="status-pill info">Active</span>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_dashboard' %}">Dashboard</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="dashboard-shell py-4">
+  <section class="card-bleed mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+      <div>
+        <div class="hero-title">Interaction Center</div>
+        <p class="hero-subtitle">Keep tabs on agent responses, pending requests, and quick actions in one place.</p>
+      </div>
+      <div class="hero-cta">
+        <a href="{% url 'create_transaction' %}" class="btn btn-gold">Start Transaction</a>
+        <a href="{% url 'client_dashboard' %}" class="btn btn-outline-light">Back to Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="section-heading">
+        <h5>Pending Agent Responses</h5>
+        <span class="status-pill {% if pending_requests %}warning{% else %}success{% endif %}">
+          {% if pending_requests %}{{ pending_requests|length }} waiting{% else %}All clear{% endif %}
+        </span>
+      </div>
+      {% if pending_requests %}
+        <ul class="list-group list-group-flush">
+          {% for req in pending_requests %}
+          <li class="list-group-item d-flex flex-column">
+            <strong>{{ req.transaction.get_platform_display }} · {{ req.transaction.amount }} {{ req.transaction.get_currency_display }}</strong>
+            <small class="text-muted">Requested {{ req.requested_at|timesince }} ago &bull; expires {{ req.expires_at|timeuntil }}</small>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No pending actions. Request an agent whenever you need help.</p>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-card">
+      <div class="section-heading">
+        <h5>Recent Conversations</h5>
+        <a href="mailto:support@dust2cash.com" class="btn btn-sm btn-outline-secondary">Contact Support</a>
+      </div>
+      {% if conversations %}
+        <ul class="list-group list-group-flush">
+          {% for convo in conversations %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong>{{ convo.agent_name }}</strong>
+              <small class="text-muted">{{ convo.updated_at|timesince }} ago</small>
+            </div>
+            <p class="mb-0 text-muted">{{ convo.last_message|truncatechars:80 }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No conversations yet. Once an agent replies, threads will appear here.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

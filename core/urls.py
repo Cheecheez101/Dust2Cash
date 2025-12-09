@@ -18,12 +18,14 @@ urlpatterns = [
     path('client/transaction/create/', views.create_transaction, name='create_transaction'),
     path('client/transaction/<int:transaction_id>/request-agent/', views.request_agent, name='request_agent'),
     path('client/transaction/<int:transaction_id>/address/', views.request_address, name='request_address'),
+    path('client/interactions/', views.client_interactions, name='client_interactions'),
 
     path('agent/portal/', views.agent_portal, name='agent_portal'),
     path('agent/request/<int:request_id>/accept/', views.agent_accept_request, name='agent_accept_request'),
     path('agent/transaction/<int:transaction_id>/provide-address/', views.agent_provide_address, name='agent_provide_address'),
     path('agent/transaction/<int:transaction_id>/confirm-receipt/', views.agent_confirm_receipt, name='agent_confirm_receipt'),
     path('agent/transaction/<int:transaction_id>/send-payment/', views.agent_send_payment, name='agent_send_payment'),
+    path('agent/interactions/', views.agent_interactions, name='agent_interactions'),
 
     path('console/', views.AdminDashboardView.as_view(), name='admin_dashboard'),
     path('console/clients/', views.AdminClientListView.as_view(), name='admin_clients'),

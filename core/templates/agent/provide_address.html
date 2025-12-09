@@ -1,86 +1,114 @@
-
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Provide Transfer Address - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-<nav class="navbar navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash" style="height:36px; margin-right:8px;">
-      <span class="brand-title">Dust2Cash Agent Portal</span>
+{% block title %}Provide Transfer Address · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Agent console</div>
+      </div>
     </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'agent_portal' %}">Back to Portal</a>
+    <div class="nav-actions">
+      {% if agent %}
+      <span class="status-pill {% if agent.is_online %}success{% else %}warning{% endif %}">
+        {% if agent.is_online %}Online{% else %}Offline{% endif %}
+      </span>
+      {% endif %}
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_portal' %}">Portal</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
     </div>
   </div>
 </nav>
 
-<main class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-5">
-          <h2 class="mb-3">Provide Transfer Address</h2>
-          
-          <div class="card bg-light border-0 p-3 mb-4">
-            <h6 class="mb-2">Transaction Details</h6>
-            <p class="mb-1"><strong>Client:</strong> {{ transaction.client }}</p>
-            <p class="mb-1"><strong>Platform:</strong> {{ transaction.get_platform_display }}</p>
-            <p class="mb-1"><strong>Currency:</strong> {{ transaction.get_currency_display }}</p>
-            <p class="mb-1"><strong>Amount:</strong> {{ transaction.amount }} {{ transaction.get_currency_display }}</p>
-            <p class="mb-0"><strong>To Pay:</strong> KSH {{ transaction.amount_to_receive }} via {{ transaction.get_payment_method_display }}</p>
-          </div>
+<main class="dashboard-shell py-4">
+  <section class="card-bleed mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-start">
+      <div>
+        <div class="hero-title">Provide Transfer Address</div>
+        <p class="hero-subtitle">Share a verified wallet address so the client can send {{ transaction.amount }} {{ transaction.get_currency_display }}.</p>
+      </div>
+      <a class="btn btn-outline-light" href="{% url 'agent_portal' %}">Back to Portal</a>
+    </div>
+  </section>
 
-          <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label class="form-label" for="transfer_address">{{ transaction.get_platform_display }} {{ transaction.get_currency_display }} Address *</label>
-              <input id="transfer_address" type="text" name="transfer_address" class="form-control font-monospace"
-                     placeholder="Enter your {{ transaction.get_platform_display }} {{ transaction.get_currency_display }} address" required>
-              <div class="form-text">Client will transfer {{ transaction.amount }} {{ transaction.get_currency_display }} to this address</div>
-            </div>
+  <section class="dashboard-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-label">Client</div>
+      <div class="stat-value fs-4">{{ transaction.client }}</div>
+      <small class="text-muted">Identity verified</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Platform</div>
+      <div class="stat-value fs-4">{{ transaction.get_platform_display }}</div>
+      <small class="text-muted">{{ transaction.get_currency_display }} wallet</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Amount</div>
+      <div class="stat-value fs-4">{{ transaction.amount }} {{ transaction.get_currency_display }}</div>
+      <small class="text-muted">To be received</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Client payout</div>
+      <div class="stat-value fs-4">KSH {{ transaction.amount_to_receive }}</div>
+      <small class="text-muted">{{ transaction.get_payment_method_display }}</small>
+    </div>
+  </section>
 
-            <div class="alert alert-warning">
-              <strong>Important:</strong> Double-check the address before submitting. The client will send funds to this address.
-            </div>
-
-            <div class="d-grid gap-2">
-              <button class="btn btn-gold btn-lg" type="submit">Provide Address to Client</button>
-              <a href="{% url 'agent_portal' %}" class="btn btn-outline-secondary">Cancel</a>
-            </div>
-          </form>
+  <section class="dashboard-card">
+    <div class="section-heading">
+      <h5>Transaction Details</h5>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Client</strong>
+          <p class="mb-0">{{ transaction.client }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Platform</strong>
+          <p class="mb-0">{{ transaction.get_platform_display }} · {{ transaction.get_currency_display }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Amount</strong>
+          <p class="mb-0">{{ transaction.amount }} {{ transaction.get_currency_display }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <strong>Client Payout</strong>
+          <p class="mb-0">KSH {{ transaction.amount_to_receive }} ({{ transaction.get_payment_method_display }})</p>
         </div>
       </div>
     </div>
-  </div>
+
+    <form method="post" class="d-grid gap-3">
+      {% csrf_token %}
+      <div>
+        <label class="form-label" for="transfer_address">{{ transaction.get_platform_display }} {{ transaction.get_currency_display }} Address *</label>
+        <input id="transfer_address" type="text" name="transfer_address" class="form-control font-monospace"
+               placeholder="Enter your {{ transaction.get_platform_display }} {{ transaction.get_currency_display }} address" required>
+        <div class="form-text">Client will transfer {{ transaction.amount }} {{ transaction.get_currency_display }} to this address.</div>
+      </div>
+      <div class="alert alert-warning">
+        Double-check the address before submitting. The client will send funds here, so accuracy is critical.
+      </div>
+      <div class="d-grid gap-2">
+        <button class="btn btn-gold" type="submit">Provide Address to Client</button>
+        <a href="{% url 'agent_portal' %}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </section>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-  window.chatwootSettings = {"position":"right","type":"standard","launcherTitle":"Chat with us"};
-  (function(d,t) {
-    var BASE_URL="https://app.chatwoot.com";
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=BASE_URL+"/packs/js/sdk.js";
-    g.async = true;
-    s.parentNode.insertBefore(g,s);
-    g.onload=function(){
-      window.chatwootSDK.run({
-        websiteToken: 'RYRXUpMGqFPFwnxkh5hYvrQF',
-        baseUrl: BASE_URL
-      })
-    }
-  })(document,"script");
-</script>
-
-
-</body>
-</html>
+{% endblock %}

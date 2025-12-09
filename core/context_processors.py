@@ -43,3 +43,11 @@ def user_portal(request):
             'role': role,
         }
     }
+
+def inject_agent_details(request):
+    pricing = PricingSettings.objects.first()
+    agent_profile = getattr(request.user, 'agent_profile', None) if request.user.is_authenticated else None
+    return {
+        'pricing': pricing,
+        'agent': agent_profile,
+    }

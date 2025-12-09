@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agent Interactions · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Agent console</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      {% if agent %}
+      <span class="status-pill {% if agent.is_online %}success{% else %}warning{% endif %}">
+        {% if agent.is_online %}Online{% else %}Offline{% endif %}
+      </span>
+      {% endif %}
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_portal' %}">Portal</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="dashboard-shell py-4">
+  <section class="card-bleed mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-start">
+      <div>
+        <div class="hero-title">Engagement Hub</div>
+        <p class="hero-subtitle">Track waiting clients, reply faster, and keep your communication score high.</p>
+      </div>
+      <div class="hero-cta">
+        <a href="{% url 'agent_portal' %}" class="btn btn-outline-light">Back to Portal</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="section-heading">
+        <h5>Waiting Clients</h5>
+        <span class="status-pill {% if waiting_clients %}warning{% else %}success{% endif %}">
+          {% if waiting_clients %}{{ waiting_clients|length }} in queue{% else %}No queue{% endif %}
+        </span>
+      </div>
+      {% if waiting_clients %}
+        <ul class="list-group list-group-flush">
+          {% for client in waiting_clients %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong>{{ client.name }}</strong>
+              <small class="text-muted">{{ client.wait_time }}</small>
+            </div>
+            <p class="mb-0 text-muted">{{ client.summary }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">All clients served. Stay online to get notified of new requests.</p>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-card">
+      <div class="section-heading">
+        <h5>Conversation Threads</h5>
+        <a href="mailto:support@dust2cash.com" class="btn btn-sm btn-outline-secondary">Escalate</a>
+      </div>
+      {% if conversations %}
+        <ul class="list-group list-group-flush">
+          {% for convo in conversations %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <strong>{{ convo.client_name }}</strong>
+              <small class="text-muted">{{ convo.updated_at|timesince }} ago</small>
+            </div>
+            <p class="mb-0 text-muted">{{ convo.last_message|truncatechars:80 }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted mb-0">No recent chats. Accepted transactions will appear here.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

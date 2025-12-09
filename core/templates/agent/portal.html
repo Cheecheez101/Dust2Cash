@@ -1,110 +1,128 @@
 <!doctype html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Agent Portal - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-{% include 'base_nav_agent.html' %}
+{% block title %}Agent Portal · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
 
-<main class="container py-4">
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h2>Agent Portal - {{ request.user.get_full_name|default:request.user.username }}</h2>
-      <p class="text-muted">Manage your availability and transactions here.</p>
-    </div>
-    <div class="col-md-4 text-end">
-      <form method="post" class="d-inline">
-        {% csrf_token %}
-        {% if agent.is_online %}
-          <button type="submit" name="action" value="go_offline" class="btn btn-danger">
-            🔴 Go Offline
-          </button>
-          <span class="badge bg-success ms-2">Online</span>
-        {% else %}
-          <button type="submit" name="action" value="go_online" class="btn btn-success">
-            🟢 Go Online
-          </button>
-          <span class="badge bg-secondary ms-2">Offline</span>
-        {% endif %}
-      </form>
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Agent console</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      {% if agent %}
+      <span class="status-pill {% if agent.is_online %}success{% else %}warning{% endif %}">
+        {% if agent.is_online %}Online{% else %}Offline{% endif %}
+      </span>
+      {% endif %}
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_portal' %}">Portal</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'agent_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
     </div>
   </div>
+</nav>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-          <h5 class="card-title mb-3">Pending Client Requests</h5>
-          
-          {% if pending_requests %}
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Requested</th>
-                    <th>Client</th>
-                    <th>Platform</th>
-                    <th>Amount</th>
-                    <th>Expires In</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for request in pending_requests %}
-                  <tr>
-                    <td>{{ request.requested_at|timesince }} ago</td>
-                    <td>{{ request.transaction.client }}</td>
-                    <td>{{ request.transaction.get_platform_display }}</td>
-                    <td>{{ request.transaction.amount }} {{ request.transaction.get_currency_display }}</td>
-                    <td>
-                      {% if request.is_expired %}
-                        <span class="badge bg-danger">Expired</span>
-                      {% else %}
-                        <span class="badge bg-warning">{{ request.expires_at|timeuntil }}</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if not request.is_expired %}
-                        <a href="{% url 'agent_accept_request' request.id %}" class="btn btn-sm btn-success">Accept</a>
-                      {% endif %}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          {% else %}
-            <p class="text-muted">No pending requests.</p>
-          {% endif %}
+<main class="dashboard-shell py-4">
+  <div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Navigation</div>
+        <div class="sidebar-nav nav flex-column gap-2">
+          <a class="nav-link {% if request.resolver_match.url_name == 'agent_portal' %}active{% endif %}" href="{% url 'agent_portal' %}">Dashboard</a>
+          <a class="nav-link" href="{% url 'agent_profile' %}">Profile</a>
+          <a class="nav-link" href="{% url 'change_password' %}">Security</a>
         </div>
       </div>
-    </div>
-  </div>
+      <div class="sidebar-section">
+        <div class="sidebar-title">Availability</div>
+        <form method="post" class="d-grid gap-2">
+          {% csrf_token %}
+          {% if agent.is_online %}
+            <button type="submit" name="action" value="go_offline" class="btn btn-outline-danger">Go Offline</button>
+          {% else %}
+            <button type="submit" name="action" value="go_online" class="btn btn-success">Go Online</button>
+          {% endif %}
+        </form>
+        <p class="small text-muted mt-2">Going offline will pause new client pings.</p>
+      </div>
+    </aside>
 
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-          <h5 class="card-title mb-3">Active Transactions</h5>
-          
+    <div class="flex-grow-1">
+      <section class="card-bleed mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-4 align-items-start">
+          <div>
+            <div class="hero-title">Welcome back, {{ request.user.get_full_name|default:request.user.username }}</div>
+            <p class="hero-subtitle">Stay online to capture new conversions, keep an eye on pending client queues, and close transactions faster.</p>
+            <div class="metric-group">
+              <span class="metric-chip">Pending Requests {{ pending_requests|length }}</span>
+              <span class="metric-chip">Active Deals {{ active_transactions|length }}</span>
+            </div>
+          </div>
+          <form method="post" class="hero-cta">
+            {% csrf_token %}
+            {% if agent.is_online %}
+              <button type="submit" name="action" value="go_offline" class="btn btn-outline-light">Go Offline</button>
+            {% else %}
+              <button type="submit" name="action" value="go_online" class="btn btn-gold">Go Online</button>
+            {% endif %}
+          </form>
+        </div>
+      </section>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <section class="dashboard-grid mb-4">
+        <div class="dashboard-card">
+          <div class="section-heading">
+            <h5>Pending Client Requests</h5>
+            <span class="auto-refresh">Refreshes every 30s</span>
+          </div>
+          {% if pending_requests %}
+            <div class="queue-list">
+              {% for request in pending_requests %}
+                <div class="queue-item">
+                  <div>
+                    <strong>{{ request.transaction.client }}</strong>
+                    <div class="text-muted small">{{ request.transaction.get_platform_display }} · {{ request.transaction.amount }} {{ request.transaction.get_currency_display }}</div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    {% if request.is_expired %}
+                      <span class="status-pill danger">Expired</span>
+                    {% else %}
+                      <span class="status-pill warning">{{ request.expires_at|timeuntil }}</span>
+                      <a href="{% url 'agent_accept_request' request.id %}" class="btn btn-sm btn-success">Accept</a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">No pending requests.</p>
+          {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+          <div class="section-heading">
+            <h5>Active Transactions</h5>
+            <span class="auto-refresh">Live</span>
+          </div>
           {% if active_transactions %}
             <div class="table-responsive">
-              <table class="table table-hover">
+              <table class="table dashboard-table align-middle">
                 <thead>
                   <tr>
                     <th>Date</th>
@@ -122,14 +140,14 @@
                     <td>{{ transaction.client }}</td>
                     <td>{{ transaction.get_platform_display }}</td>
                     <td>{{ transaction.amount }} {{ transaction.get_currency_display }}</td>
-                    <td><span class="badge bg-primary">{{ transaction.get_status_display }}</span></td>
+                    <td><span class="status-pill info">{{ transaction.get_status_display }}</span></td>
                     <td>
                       {% if transaction.status == 'agent_online' %}
-                        <a href="{% url 'agent_provide_address' transaction.id %}" class="btn btn-sm btn-primary">Provide Address</a>
+                        <a href="{% url 'agent_provide_address' transaction.id %}" class="btn btn-sm btn-outline-primary">Provide Address</a>
                       {% elif transaction.status == 'address_provided' %}
-                        <a href="{% url 'agent_confirm_receipt' transaction.id %}" class="btn btn-sm btn-warning">Confirm Receipt</a>
+                        <a href="{% url 'agent_confirm_receipt' transaction.id %}" class="btn btn-sm btn-outline-warning">Confirm Receipt</a>
                       {% elif transaction.status == 'crypto_received' %}
-                        <a href="{% url 'agent_send_payment' transaction.id %}" class="btn btn-sm btn-success">Send Payment</a>
+                        <a href="{% url 'agent_send_payment' transaction.id %}" class="btn btn-sm btn-outline-success">Send Payment</a>
                       {% endif %}
                     </td>
                   </tr>
@@ -138,54 +156,52 @@
               </table>
             </div>
           {% else %}
-            <p class="text-muted">No active transactions.</p>
+            <p class="text-muted mb-0">No active transactions.</p>
           {% endif %}
         </div>
-      </div>
-    </div>
-  </div>
+      </section>
 
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-          <h5 class="card-title mb-3">Recent Completed Transactions</h5>
-          
-          {% if completed_transactions %}
-            <div class="table-responsive">
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Client</th>
-                    <th>Amount</th>
-                    <th>Paid</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for transaction in completed_transactions %}
-                  <tr>
-                    <td>{{ transaction.created_at|date:"M d, H:i" }}</td>
-                    <td>{{ transaction.client }}</td>
-                    <td>{{ transaction.amount }} {{ transaction.get_currency_display }}</td>
-                    <td>KSH {{ transaction.amount_to_receive }}</td>
-                    <td><span class="badge bg-success">{{ transaction.get_status_display }}</span></td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          {% else %}
-            <p class="text-muted">No completed transactions yet.</p>
-          {% endif %}
+      <section class="dashboard-card">
+        <div class="section-heading">
+          <h5>Recent Completed Transactions</h5>
+          <span class="auto-refresh">Past week</span>
         </div>
-      </div>
+        {% if completed_transactions %}
+          <div class="table-responsive">
+            <table class="table table-sm dashboard-table align-middle">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Client</th>
+                  <th>Amount</th>
+                  <th>Paid</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in completed_transactions %}
+                <tr>
+                  <td>{{ transaction.created_at|date:"M d, H:i" }}</td>
+                  <td>{{ transaction.client }}</td>
+                  <td>{{ transaction.amount }} {{ transaction.get_currency_display }}</td>
+                  <td>KSH {{ transaction.amount_to_receive }}</td>
+                  <td><span class="status-pill success">{{ transaction.get_status_display }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No completed transactions yet.</p>
+        {% endif %}
+      </section>
     </div>
   </div>
 </main>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}
+{{ block.super }}
 <script>
 setTimeout(() => location.reload(), 30000);
 </script>
@@ -205,6 +221,4 @@ setTimeout(() => location.reload(), 30000);
     }
   })(document,"script");
 </script>
-
-</body>
-</html>
+{% endblock %}

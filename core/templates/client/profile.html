@@ -1,16 +1,29 @@
 <!doctype html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Complete Your Profile - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{% static 'css/main.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
 
-{% include 'base_nav_client.html' %}
+{% block title %}Complete Your Profile · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Client workspace</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="status-pill info">Active</span>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_dashboard' %}">Dashboard</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
 
 <main class="container py-5">
   <div class="row justify-content-center">
@@ -69,7 +82,4 @@
     </div>
   </div>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}

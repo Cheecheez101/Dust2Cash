@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security / environment-friendly defaults
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
-DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes') #false for production
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in ('1', 'true', 'yes') #false for production
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'dust2cash-b8e6.onrender.com,.vercel.app,127.0.0.1').split(',')
 
 
@@ -51,11 +51,11 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.template.context_processors.static',     # makes STATIC_URL available to templates
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.dust2cash_settings',
                 'core.context_processors.user_portal',
+                'core.context_processors.inject_agent_details',
             ],
         },
     },

@@ -1,34 +1,71 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Create Transaction - Dust2Cash</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="/static/css/main.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
+{% load static %}
 
-<nav class="navbar navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/static/img/dust2cashlogo.png" alt="Dust2Cash" style="height:36px; margin-right:8px;">
-      <span class="brand-title">Dust2Cash</span>
+{% block title %}Create Transaction · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Client workspace</div>
+      </div>
     </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-dark btn-sm" href="{% url 'client_dashboard' %}">Dashboard</a>
-      <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
+    <div class="nav-actions">
+      <span class="status-pill info">Active</span>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_dashboard' %}">Dashboard</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
     </div>
   </div>
 </nav>
 
-<main class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow-sm border-0">
-        <div class="card-body p-5">
-          <h2 class="mb-3">Create New Transaction</h2>
-          
+<main class="dashboard-shell py-4">
+  <section class="card-bleed mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+      <div>
+        <div class="hero-title">Capture a new transaction</div>
+        <p class="hero-subtitle">Fill in your platform, amount, and payout method. We'll calculate the expected KSH instantly.</p>
+        <div class="metric-group">
+          <span class="metric-chip">Live Rate <strong>1 USDT = KSH {{ pricing.exchange_rate }}</strong></span>
+          <span class="metric-chip">Fee {{ pricing.transaction_fee_percent }}%</span>
+        </div>
+      </div>
+      <div class="text-lg-end">
+        <div class="stat-label">Need an agent?</div>
+        <p class="mb-2">You can assign any online agent right inside this form.</p>
+        <a class="btn btn-outline-light" href="{% url 'client_dashboard' %}">Back to dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid mb-4">
+    <div class="stat-card">
+      <div class="stat-label">Support</div>
+      <div class="stat-value fs-5">support@dust2cash.com</div>
+      <small class="text-muted">We reply within minutes</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Minimum amount</div>
+      <div class="stat-value fs-4">5 USDT</div>
+      <small class="text-muted">Lower trades not accepted</small>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Assign agent</div>
+      <div class="stat-value fs-4">Optional</div>
+      <small class="text-muted">Pick anyone online</small>
+    </div>
+  </section>
+
+  <section class="dashboard-card">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-5">
+        <h2 class="mb-3">Create New Transaction</h2>
+
 <!--          {% if not agent_offline %}-->
 <!--            <div class="alert alert-warning">-->
 <!--              <strong>No agent is currently online.</strong> You can still create your transaction, and you'll be able to request agent assistance afterward.-->
@@ -117,10 +154,12 @@
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </main>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}
+{{ block.super }}
 <script>
 const rate = {{ pricing.exchange_rate }};
 const feePercent = {{ pricing.transaction_fee_percent }} / 100;
@@ -157,6 +196,4 @@ amountInput.addEventListener('input', action);
     }
   })(document,"script");
 </script>
-
-</body>
-</html>
+{% endblock %}

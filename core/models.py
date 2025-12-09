@@ -34,6 +34,9 @@ class AgentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='agent_profile')
     is_online = models.BooleanField(default=False)
     last_online = models.DateTimeField(null=True, blank=True)
+    phone_number = models.CharField(max_length=15, default='N/A')
+    email = models.EmailField(default='example@example.com')
+    created_at = models.DateTimeField(default=timezone.now)
 
     def go_online(self):
         self.is_online = True
