@@ -1,9 +1,12 @@
 import os
 import importlib.util
 from pathlib import Path
+from dotenv import load_dotenv
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 # Security / environment-friendly defaults
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
@@ -105,8 +108,25 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email config (console for dev)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email config (defaults to console unless overridden in .env)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp-relay.brevo.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('1', 'true', 'yes')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False').lower() in ('1', 'true', 'yes')
+
+# Sendinblue / Brevo (SIB) settings - read from environment; leave console backend as default for dev
+SIB_API_KEY = os.getenv('BREVO_API_KEY') or os.getenv('SIB_API_KEY')
+SIB_SENDER_EMAIL = os.getenv('BREVO_SENDER_EMAIL') or os.getenv('SIB_SENDER_EMAIL')
+SIB_SENDER_NAME = os.getenv('BREVO_SENDER_NAME') or os.getenv('SIB_SENDER_NAME') or 'Dust2Cash'
+
+# Admin contact (used for contact form notifications)
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'support@michaelnganga.me')
+
+# Default from email used by send_mail when no from_email provided
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', SIB_SENDER_EMAIL or 'support@michaelnganga.me')
 
 # put near end of settings.py
 import logging

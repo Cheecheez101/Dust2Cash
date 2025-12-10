@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
+import os
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from datetime import timedelta
 from decimal import Decimal
 import csv
+import logging
 from django.http import HttpResponse, Http404, JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
@@ -20,9 +22,53 @@ from django.utils.crypto import get_random_string
 from django.db import transaction
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.utils.html import strip_tags
 
 from .decorators import agent_required, client_required
 from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
+
+logger = logging.getLogger(__name__)
+
+try:
+    from services.email.sib_client import send_transactional_email, is_email_client_configured
+except Exception:
+    send_transactional_email = None
+    is_email_client_configured = lambda: False
+
+
+def _fallback_send_mail(to_email, subject, html_content=None, text_content=None):
+    text_body = text_content or strip_tags(html_content or '')
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@michaelnganga.me')
+    email = EmailMultiAlternatives(subject, text_body, from_email, [to_email])
+    if html_content:
+        email.attach_alternative(html_content, 'text/html')
+    email.send(fail_silently=False)
+
+
+def send_email_notification(*, to_email, subject, html_content=None, text_content=None):
+    if not to_email:
+        logger.warning("No recipient provided for subject '%s'", subject)
+        return False
+    try:
+        if send_transactional_email:
+            send_transactional_email(
+                to_email=to_email,
+                subject=subject,
+                html_content=html_content or text_content or '',
+                text_content=text_content,
+            )
+        else:
+            _fallback_send_mail(
+                to_email=to_email,
+                subject=subject,
+                html_content=html_content,
+                text_content=text_content,
+            )
+        return True
+    except Exception:
+        logger.exception("Failed to send email to %s", to_email)
+        return False
+
 
 # Lazy-model loader to avoid importing Django models at module import time
 _models_loaded = False
@@ -56,7 +102,77 @@ def about_page(request):
 
 
 def contact_page(request):
-    return render(request, 'contact.html')
+    # Render form on GET; handle submission on POST
+    email_backend = getattr(settings, 'EMAIL_BACKEND', '')
+    context = {
+        'email_ready': bool(send_transactional_email) or email_backend != 'django.core.mail.backends.dummy.EmailBackend'
+    }
+    if request.method == 'POST':
+        name = f"{request.POST.get('first_name','').strip()} {request.POST.get('last_name','').strip()}".strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        message = request.POST.get('message', '').strip()
+        contact_method = request.POST.get('contact_method', 'email')
+
+        # Basic server-side validation
+        if not name or not email or not message:
+            messages.error(request, 'Please complete the form before submitting.')
+            return render(request, 'contact.html', context)
+
+        # Admin notification
+        ADMIN_EMAIL = getattr(settings, 'ADMIN_EMAIL', os.getenv('ADMIN_EMAIL', 'michaelnganga678@gmail.com'))
+        admin_html = f"""
+        <h3>New Message from Portfolio Contact Form</h3>
+        <p><b>Name:</b> {name}<br>
+           <b>Email:</b> {email}<br>
+           <b>Subject:</b> Contact form submission</p>
+        <p><b>Message:</b><br>{message}</p>
+        <p><b>Phone:</b> {phone}</p>
+        <p><b>Preferred contact method:</b> {contact_method}</p>
+        """
+        text_body = (
+            "New message from Dust2Cash contact form.\n"
+            f"Name: {name}\nEmail: {email}\nPhone: {phone}\n"
+            f"Preferred contact method: {contact_method}\n\nMessage:\n{message}"
+        )
+
+        admin_sent = send_email_notification(
+            to_email=ADMIN_EMAIL,
+            subject="Dust2Cash Contact Form Submission",
+            html_content=admin_html,
+            text_content=text_body,
+        )
+        if not admin_sent:
+            messages.warning(
+                request,
+                'Message received, but we could not send the admin notification email.',
+            )
+
+        # Auto-reply to user
+        user_html = f"""
+        <h3>Hi {name.split(' ')[0] if name else 'there'},</h3>
+        <p>Thank you for contacting <b>Michael Ng'ang'a</b>! I’ve received your message:</p>
+        <blockquote>{message}</blockquote>
+        <p>I’ll get back to you as soon as possible.</p>
+        <br>
+        <p>Best regards,<br>Michael Ng'ang'a</p>
+        """
+        user_sent = send_email_notification(
+            to_email=email,
+            subject="We received your Dust2Cash inquiry",
+            html_content=user_html,
+            text_content=f"Hi {name or 'there'},\n\nThanks for contacting Dust2Cash. We'll respond shortly.\n\nMessage: {message}",
+        )
+        if not user_sent:
+            messages.info(
+                request,
+                'We received your message, but the confirmation email could not be delivered.',
+            )
+
+        messages.success(request, 'Thank you — your message has been sent. We\'ll reply shortly.')
+        return redirect('contact')
+
+    return render(request, 'contact.html', context)
 
 
 def pricing_page(request):
@@ -408,6 +524,7 @@ def agent_send_payment(request, transaction_id):
     return render(request, 'agent/send_payment.html', {'transaction': transaction, 'agent': agent})
 
 
+
 def send_notification_to_agent(transaction):
     try:
         agents = AgentProfile.objects.all()
@@ -434,12 +551,10 @@ https://dust2cash.com/agent/portal/
 Best regards,
 Dust2Cash Team
 """
-                send_mail(
-                    'New Client Request on Dust2Cash',
-                    message,
-                    settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@dust2cash.com',
-                    [agent.user.email],
-                    fail_silently=True,
+                send_email_notification(
+                    to_email=agent.user.email,
+                    subject='New Client Request on Dust2Cash',
+                    text_content=message,
                 )
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -474,12 +589,10 @@ The agent will review your request shortly.
 Best regards,
 Dust2Cash Team
 """
-                send_mail(
-                    'Agent is Now Online - Dust2Cash',
-                    message,
-                    settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@dust2cash.com',
-                    [client_email],
-                    fail_silently=True,
+                send_email_notification(
+                    to_email=client_email,
+                    subject='Agent is Now Online - Dust2Cash',
+                    text_content=message,
                 )
             except Exception as e:
                 print(f"Error sending email: {e}")
@@ -513,12 +626,10 @@ https://dust2cash.com/client/dashboard/
 Best regards,
 Dust2Cash Team
 """
-            send_mail(
-                'Agent Accepted Your Request - Dust2Cash',
-                message,
-                settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@dust2cash.com',
-                [client_email],
-                fail_silently=True,
+            send_email_notification(
+                to_email=client_email,
+                subject='Agent Accepted Your Request - Dust2Cash',
+                text_content=message,
             )
         except Exception as e:
             print(f"Error sending email: {e}")
@@ -550,12 +661,10 @@ If you have any issues, please contact our support team.
 Best regards,
 Dust2Cash Team
 """
-            send_mail(
-                'Payment Sent - Dust2Cash',
-                message,
-                settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@dust2cash.com',
-                [client_email],
-                fail_silently=True,
+            send_email_notification(
+                to_email=client_email,
+                subject='Payment Sent - Dust2Cash',
+                text_content=message,
             )
         except Exception as e:
             print(f"Error sending email: {e}")
@@ -944,18 +1053,16 @@ def admin_application_verify(request, pk):
     application.reviewed_at = timezone.now()
     application.save(update_fields=['status', 'reviewed_by', 'reviewed_at', 'created_user'])
     if password:
-        send_mail(
-            'Welcome to Dust2Cash Agent Network',
-            (
+        send_email_notification(
+            to_email=application.email,
+            subject='Welcome to Dust2Cash Agent Network',
+            text_content=(
                 f"Hi {application.full_name},\n\n"
                 f"Your agent application has been approved.\n"
                 f"Username: {application.created_user.username}\n"
                 f"Temporary password: {password}\n\n"
                 "Please log in and update your credentials."
             ),
-            getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@dust2cash.com'),
-            [application.email],
-            fail_silently=True,
         )
     messages.success(request, 'Application marked as verified.')
     return redirect('admin_application_detail', pk=pk)

@@ -23,6 +23,11 @@
               <p class="text-muted mb-1">We typically reply within one business day.</p>
               <h3 class="mb-0">Send us a message</h3>
             </div>
+            {% if not email_ready %}
+            <div class="alert alert-warning" role="alert">
+              Email notifications are currently disabled in this environment; we’ll respond via dashboard once available.
+            </div>
+            {% endif %}
             <form class="row g-4" method="post" action="{% url 'contact' %}">
               {% csrf_token %}
               <div class="col-md-6">
