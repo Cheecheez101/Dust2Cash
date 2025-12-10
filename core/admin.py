@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
-from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest, AgentApplication
+from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest, AgentApplication, ContactSubmission
 
 
 @admin.register(AdminProfile)
@@ -65,3 +65,11 @@ class AgentApplicationAdmin(admin.ModelAdmin):
 
     mark_verified.short_description = 'Mark selected applications as verified'
     mark_cancelled.short_description = 'Mark selected applications as cancelled'
+
+
+@admin.register(ContactSubmission)
+class ContactSubmissionAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'email', 'phone', 'contact_method', 'submitted_at')
+    list_filter = ('contact_method', 'submitted_at')
+    search_fields = ('first_name', 'last_name', 'email', 'phone', 'message')
+    readonly_fields = ('submitted_at',)

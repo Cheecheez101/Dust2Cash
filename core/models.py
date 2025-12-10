@@ -204,3 +204,23 @@ class AgentApplication(models.Model):
 
     def __str__(self):
         return f"Agent application - {self.full_name}"
+
+
+class ContactSubmission(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    contact_method = models.CharField(max_length=20, choices=[
+        ('phone', 'Phone'),
+        ('email', 'Email'),
+        ('other', 'Other'),
+    ])
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-submitted_at']
+    
+    def __str__(self):
+        return f"Contact from {self.first_name} {self.last_name} - {self.submitted_at.strftime('%Y-%m-%d %H:%M')}"

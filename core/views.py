@@ -26,11 +26,11 @@ from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, Ag
 
 # Lazy-model loader to avoid importing Django models at module import time
 _models_loaded = False
-ClientProfile = AgentProfile = Transaction = AgentRequest = AdminProfile = AgentApplication = PricingSettings = None
+ClientProfile = AgentProfile = Transaction = AgentRequest = AdminProfile = AgentApplication = PricingSettings = ContactSubmission = None
 
 def ensure_models_loaded():
     """Import models when first needed to avoid AppRegistryNotReady during module import."""
-    global _models_loaded, ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication, PricingSettings
+    global _models_loaded, ClientProfile, AgentProfile, Transaction, AgentRequest, AdminProfile, AgentApplication, PricingSettings, ContactSubmission
     if _models_loaded:
         return
     from . import models as _models
@@ -41,7 +41,28 @@ def ensure_models_loaded():
     AdminProfile = _models.AdminProfile
     AgentApplication = _models.AgentApplication
     PricingSettings = _models.PricingSettings
+    ContactSubmission = _models.ContactSubmission
     _models_loaded = True
+
+
+def send_transactional_email(subject, message, recipient_list, fail_silently=True):
+    """
+    Helper function to send transactional emails.
+    This function handles email sending with proper error handling and logging.
+    """
+    try:
+        from_email = settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@dust2cash.com'
+        send_mail(
+            subject,
+            message,
+            from_email,
+            recipient_list,
+            fail_silently=fail_silently,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
 
 
 
@@ -56,6 +77,95 @@ def about_page(request):
 
 
 def contact_page(request):
+    ensure_models_loaded()
+    
+    if request.method == 'POST':
+        # Extract form data
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        message_text = request.POST.get('message', '').strip()
+        contact_method = request.POST.get('contact_method', '').strip()
+        
+        # Validate required fields
+        if all([first_name, last_name, email, phone, message_text, contact_method]):
+            try:
+                # Save the contact submission to database
+                contact = ContactSubmission.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    email=email,
+                    phone=phone,
+                    message=message_text,
+                    contact_method=contact_method
+                )
+                
+                # Send admin notification email
+                admin_message = f"""
+New Contact Form Submission - Dust2Cash
+
+Contact Details:
+- Name: {first_name} {last_name}
+- Email: {email}
+- Phone: {phone}
+- Preferred Contact Method: {contact_method}
+
+Message:
+{message_text}
+
+Submitted at: {contact.submitted_at.strftime('%Y-%m-%d %H:%M:%S')}
+
+View in admin panel: https://dust2cash.com/admin/core/contactsubmission/{contact.id}/
+"""
+                # Get admin emails
+                admin_emails = User.objects.filter(is_staff=True).values_list('email', flat=True)
+                if admin_emails:
+                    if not send_transactional_email(
+                        'New Contact Form Submission - Dust2Cash',
+                        admin_message,
+                        list(admin_emails)
+                    ):
+                        print("send_transactional_email helper not available; skipping admin notification")
+                
+                # Send auto-reply to user
+                user_message = f"""
+Dear {first_name},
+
+Thank you for contacting Dust2Cash! We have received your message and will get back to you soon.
+
+Your Message:
+{message_text}
+
+Our team typically responds within one business day. We will contact you via your preferred method: {contact_method}.
+
+If you have any urgent questions, please don't hesitate to reach out to us directly.
+
+Best regards,
+The Dust2Cash Team
+
+---
+This is an automated message. Please do not reply to this email.
+"""
+                if not send_transactional_email(
+                    'Thank You for Contacting Dust2Cash',
+                    user_message,
+                    [email]
+                ):
+                    print("send_transactional_email helper not available; skipping auto-reply")
+                
+                # Add success message
+                messages.success(request, 'Thank you for your message! We will get back to you soon.')
+                
+            except Exception as e:
+                print(f"Error processing contact form: {e}")
+                messages.error(request, 'There was an error submitting your message. Please try again.')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+        
+        # Redirect to avoid form resubmission
+        return redirect('contact')
+    
     return render(request, 'contact.html')
 
 
