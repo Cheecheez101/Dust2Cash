@@ -66,19 +66,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dust2cash.wsgi.application'
 # ------------uncomment for local use---------------#
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+#
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.getenv('DATABASE_URL')
+#     )
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -127,6 +127,10 @@ ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'support@michaelnganga.me')
 
 # Default from email used by send_mail when no from_email provided
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', SIB_SENDER_EMAIL or 'support@michaelnganga.me')
+
+# Celery / Redis configuration
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 # put near end of settings.py
 import logging

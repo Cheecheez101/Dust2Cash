@@ -26,6 +26,7 @@ from django.utils.html import strip_tags
 
 from .decorators import agent_required, client_required
 from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
+from .tasks import send_payment_confirmation_task
 
 logger = logging.getLogger(__name__)
 
@@ -515,9 +516,9 @@ def agent_send_payment(request, transaction_id):
     if request.method == "POST":
         transaction.status = 'payment_sent'
         transaction.save()
-        
-        send_payment_confirmation(transaction)
-        
+
+        send_payment_confirmation_task.delay(transaction.id)
+
         messages.success(request, 'Payment marked as sent!')
         return redirect('agent_portal')
     
@@ -629,41 +630,6 @@ Dust2Cash Team
             send_email_notification(
                 to_email=client_email,
                 subject='Agent Accepted Your Request - Dust2Cash',
-                text_content=message,
-            )
-        except Exception as e:
-            print(f"Error sending email: {e}")
-
-
-def send_payment_confirmation(transaction):
-    client_email = transaction.client.email
-    if client_email:
-        try:
-            message = f"""
-Payment Sent - Dust2Cash
-
-Your payment has been processed and sent!
-
-Transaction Summary:
-- Crypto Sent: {transaction.amount} {transaction.get_currency_display()}
-- Exchange Rate: KSH {transaction.exchange_rate} per {transaction.get_currency_display()}
-- Payment Amount: KSH {transaction.amount_to_receive}
-- Payment Method: {transaction.get_payment_method_display()}
-- Payment Phone: {transaction.payment_phone}
-
-The payment has been sent to your {transaction.get_payment_method_display()} number. 
-You should receive it shortly.
-
-Thank you for using Dust2Cash!
-
-If you have any issues, please contact our support team.
-
-Best regards,
-Dust2Cash Team
-"""
-            send_email_notification(
-                to_email=client_email,
-                subject='Payment Sent - Dust2Cash',
                 text_content=message,
             )
         except Exception as e:
