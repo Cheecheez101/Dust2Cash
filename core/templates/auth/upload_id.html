@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  {% include 'auth/verify_banner.html' %}
+  <h2 class="mb-3">Upload Government ID</h2>
+  <p class="text-muted">Accepted formats: PDF, JPG, PNG. We only use this for compliance and never share it externally.</p>
+  <form method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.id_document.label_tag }}
+      {{ form.id_document }}
+      {% if form.id_document.errors %}<div class="text-danger small">{{ form.id_document.errors.0 }}</div>{% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+    <a href="{% url 'client_dashboard' %}" class="btn btn-link">Cancel</a>
+  </form>
+</div>
+{% endblock %}
+

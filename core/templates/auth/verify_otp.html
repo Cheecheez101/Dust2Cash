@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Phone · Dust2Cash{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block content %}
+<nav class="navbar dashboard-nav bg-white shadow-sm">
+  <div class="nav-inner container">
+    <a class="nav-identity" href="/">
+      <img src="{% static 'img/dust2cashlogo.png' %}" alt="Dust2Cash logo">
+      <div>
+        <strong>Dust2Cash</strong>
+        <div class="text-muted small">Client workspace</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <span class="status-pill info">Active</span>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_dashboard' %}">Dashboard</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'client_profile' %}">Profile</a>
+      <a class="nav-pill nav-pill--ghost" href="{% url 'change_password' %}">Password</a>
+      <a class="nav-pill nav-pill--danger" href="{% url 'logout' %}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  {% include 'auth/verify_banner.html' %}
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-6">
+      <div class="p-4 rounded-4 shadow-sm bg-white border border-light-subtle">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-circle bg-success-subtle text-success px-3 py-2 fw-bold">2/2</div>
+          <div>
+            <h2 class="h4 mb-0">Verify your phone</h2>
+            <small class="text-muted">Enter the one-time code we sent to your number.</small>
+          </div>
+        </div>
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <button type="submit" class="btn btn-success px-4">Verify & Continue</button>
+            <a href="{% url 'request_otp' %}" class="btn btn-outline-secondary">Resend code</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="p-4 rounded-4 bg-dark text-white shadow-sm h-100">
+        <h3 class="h5">Need help?</h3>
+        <p class="text-white-50 mb-4">If the SMS doesn’t arrive within a minute, double-check your phone number and request another code. You can also reach support via <a href="mailto:support@dust2cash.com" class="text-white">support@dust2cash.com</a>.</p>
+        <ul class="list-unstyled text-white-50 small mb-4">
+          <li class="mb-2">• Keep this page open while you fetch the code.</li>
+          <li class="mb-2">• Codes expire after 5 minutes for security.</li>
+          <li class="mb-2">• Trouble receiving SMS? Toggle airplane mode or restart your device.</li>
+        </ul>
+        <div class="rounded-3 bg-success-subtle text-success p-3">
+          <strong>Next unlock:</strong>
+          <p class="mb-0">Once verified, your account completion jumps to <span class="fw-bold">100%</span> and higher limits become available immediately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

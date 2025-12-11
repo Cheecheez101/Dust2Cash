@@ -19,6 +19,10 @@ urlpatterns = [
     path('client/transaction/<int:transaction_id>/request-agent/', views.request_agent, name='request_agent'),
     path('client/transaction/<int:transaction_id>/address/', views.request_address, name='request_address'),
     path('client/interactions/', views.client_interactions, name='client_interactions'),
+    path('client/verify-phone/', views.request_otp_view, name='request_otp'),
+    path('client/verify-phone/confirm/', views.verify_otp_view, name='verify_otp'),
+    path('client/verify-id/', views.upload_id_view, name='upload_id'),
+    path('webhooks/africastalking/delivery/', views.sms_delivery_report, name='sms_delivery_report'),
 
     path('agent/portal/', views.agent_portal, name='agent_portal'),
     path('agent/request/<int:request_id>/accept/', views.agent_accept_request, name='agent_accept_request'),

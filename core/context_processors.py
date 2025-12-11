@@ -1,6 +1,7 @@
 # core/context_processors.py
 from .models import PricingSettings
 from django.utils import timezone
+from .models import AccountVerification
 
 
 def dust2cash_settings(request):
@@ -47,7 +48,11 @@ def user_portal(request):
 def inject_agent_details(request):
     pricing = PricingSettings.objects.first()
     agent_profile = getattr(request.user, 'agent_profile', None) if request.user.is_authenticated else None
+    verification = None
+    if request.user.is_authenticated:
+        verification, _ = AccountVerification.objects.get_or_create(user=request.user)
     return {
         'pricing': pricing,
         'agent': agent_profile,
+        'account_verification': verification,
     }

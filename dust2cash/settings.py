@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'core',
+    'core.apps.CoreConfig',
 ]
 
 # Detect whether whitenoise is installed so we can fail gracefully during builds
@@ -66,19 +67,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dust2cash.wsgi.application'
 # ------------uncomment for local use---------------#
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL')
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.getenv('DATABASE_URL')
+#     )
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -131,6 +132,12 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', SIB_SENDER_EMAIL or 'suppor
 # Celery / Redis configuration
 CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BEAT_SCHEDULE = {
+    'expire-agent-requests-every-15-minutes': {
+        'task': 'core.tasks.expire_agent_requests',
+        'schedule': crontab(minute='*/15'),
+    },
+}
 
 # put near end of settings.py
 import logging

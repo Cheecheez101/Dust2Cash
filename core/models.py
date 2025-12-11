@@ -204,3 +204,40 @@ class AgentApplication(models.Model):
 
     def __str__(self):
         return f"Agent application - {self.full_name}"
+
+
+class AccountVerification(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    id_uploaded = models.BooleanField(default=False)
+    phone_verified = models.BooleanField(default=False)
+    id_document = models.FileField(upload_to='verification_docs/', blank=True, null=True)
+    completion_score = models.IntegerField(default=0)
+    limits_unlocked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def refresh_completion(self):
+        score = 0
+        if self.id_uploaded:
+            score += 50
+        if self.phone_verified:
+            score += 50
+        self.completion_score = score
+        self.limits_unlocked = score == 100
+        return score
+
+    def mark_phone_verified(self):
+        if not self.phone_verified:
+            self.phone_verified = True
+            self.refresh_completion()
+            self.save(update_fields=['phone_verified', 'completion_score', 'limits_unlocked', 'updated_at'])
+
+    def mark_id_uploaded(self, document=None):
+        if document is not None:
+            self.id_document = document
+        self.id_uploaded = True
+        self.refresh_completion()
+        self.save(update_fields=['id_uploaded', 'id_document', 'completion_score', 'limits_unlocked', 'updated_at'])
+
+    def __str__(self):
+        return f"{self.user.username} - {self.completion_score}%"

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import ClientProfile, Transaction, AgentProfile, AgentApplication, PricingSettings
+from .models import ClientProfile, Transaction, AgentProfile, AgentApplication, PricingSettings, AccountVerification
 
 
 class LoginForm(forms.Form):
@@ -120,3 +120,40 @@ class PricingSettingsForm(forms.ModelForm):
             'exchange_rate': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'transaction_fee_percent': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
+
+
+class OTPForm(forms.Form):
+    phone_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+2547…'})
+    )
+    otp = forms.CharField(
+        max_length=6,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '6-digit code'})
+    )
+
+
+class IDUploadForm(forms.ModelForm):
+    class Meta:
+        model = AccountVerification
+        fields = ['id_document']
+        widgets = {
+            'id_document': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}),
+        }
+
+    def save(self, user=None, commit=True):
+        verification = AccountVerification.objects.get_or_create(user=user)[0] if user else super().save(commit=False)
+        if self.cleaned_data.get('id_document'):
+            verification.id_document = self.cleaned_data['id_document']
+        verification.mark_id_uploaded(document=verification.id_document)
+        return verification
+
+
+class OTPRequestForm(forms.Form):
+    phone_number = forms.CharField(
+        max_length=15,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+2547…'})
+    )

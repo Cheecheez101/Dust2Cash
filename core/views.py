@@ -14,6 +14,7 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView, FormView
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -23,6 +24,9 @@ from django.db import transaction
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.utils.html import strip_tags
+from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm, OTPForm, IDUploadForm, OTPRequestForm
+from .utils.africas_talking import send_otp, verify_otp
+from .models import AccountVerification
 
 from .decorators import agent_required, client_required
 from .forms import LoginForm, SignUpForm, ClientProfileForm, TransactionForm, AgentApplicationForm, PricingSettingsForm
@@ -266,14 +270,15 @@ def client_profile(request):
         profile = request.user.client_profile
     except ClientProfile.DoesNotExist:
         profile = ClientProfile.objects.create(user=request.user)
-    
+    verification, _ = AccountVerification.objects.get_or_create(user=request.user)
+
     form = ClientProfileForm(request.POST or None, instance=profile)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('client_dashboard')
     
-    return render(request, 'client/profile.html', {'form': form, 'profile': profile})
+    return render(request, 'client/profile.html', {'form': form, 'profile': profile, 'account_verification': verification})
 
 
 @login_required
@@ -287,7 +292,8 @@ def client_dashboard(request):
     except ClientProfile.DoesNotExist:
         messages.warning(request, 'Please complete your profile first')
         return redirect('client_profile')
-    
+    verification, _ = AccountVerification.objects.get_or_create(user=request.user)
+
     agent_online = AgentProfile.objects.filter(is_online=True).exists()
     
     transactions = Transaction.objects.filter(client=profile).order_by('-created_at')
@@ -300,6 +306,7 @@ def client_dashboard(request):
         'transactions': transactions,
         'requestable_transaction': requestable_transaction,
         'pricing': pricing,
+        'account_verification': verification,
     }
     return render(request, 'client/dashboard.html', context)
 
@@ -1130,3 +1137,55 @@ def agent_interactions(request):
         'agent': agent,
     }
     return render(request, 'agent/interactions.html', context)
+
+
+@login_required
+def request_otp_view(request):
+    form = OTPRequestForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        phone = form.cleaned_data['phone_number']
+        try:
+            send_otp(phone)
+            messages.success(request, "OTP sent successfully")
+            return redirect("verify_otp")
+        except ValueError as exc:
+            form.add_error('phone_number', str(exc))
+        except Exception:
+            messages.error(request, 'We could not send the OTP right now. Please try again in a moment.')
+    return render(request, "auth/request_otp.html", {'form': form})
+
+
+@login_required
+def verify_otp_view(request):
+    if request.method == "POST":
+        form = OTPForm(request.POST)
+        if form.is_valid():
+            phone = form.cleaned_data["phone_number"]
+            otp = form.cleaned_data["otp"]
+            if verify_otp(phone, otp, user=request.user):
+                messages.success(request, "Phone verified successfully!")
+                return redirect("client_dashboard")
+            else:
+                messages.error(request, "Invalid OTP. Try again.")
+    else:
+        form = OTPForm()
+    return render(request, "auth/verify_otp.html", {"form": form})
+
+
+@login_required
+def upload_id_view(request):
+    verification, _ = AccountVerification.objects.get_or_create(user=request.user)
+    form = IDUploadForm(request.POST or None, request.FILES or None, instance=verification)
+    if request.method == 'POST' and form.is_valid():
+        form.save(user=request.user)
+        messages.success(request, 'Government ID uploaded successfully!')
+        return redirect('client_dashboard')
+    return render(request, 'auth/upload_id.html', {'form': form, 'account_verification': verification})
+
+
+@csrf_exempt
+def sms_delivery_report(request):
+    data = request.POST.dict() if request.method == 'POST' else {}
+    logger.info('Africa\'s Talking delivery report: %s', data)
+    return JsonResponse({'status': 'ok'})
+
