@@ -31,7 +31,7 @@
         <div class="hero-title">Capture a new transaction</div>
         <p class="hero-subtitle">Fill in your platform, amount, and payout method. We'll calculate the expected KSH instantly.</p>
         <div class="metric-group">
-          <span class="metric-chip">Live Rate <strong>1 USDT = KSH {{ pricing.exchange_rate }}</strong></span>
+          <span class="metric-chip">Live Rate <strong>0.1&nbsp;USDT = KSH {{ pricing.exchange_rate|floatformat:2 }}</strong></span>
           <span class="metric-chip">Fee {{ pricing.transaction_fee_percent }}%</span>
         </div>
       </div>
@@ -51,7 +51,7 @@
     </div>
     <div class="stat-card">
       <div class="stat-label">Minimum amount</div>
-      <div class="stat-value fs-4">5 USDT</div>
+      <div class="stat-value fs-4">0.1 USDT</div>
       <small class="text-muted">Lower trades not accepted</small>
     </div>
     <div class="stat-card">
@@ -101,7 +101,7 @@
               <label class="form-label">Amount *</label>
               {{ form.amount }}
               {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors.0 }}</div>{% endif %}
-              <div class="form-text">Minimum: 5 USDT</div>
+              <div class="form-text">Minimum: 0.1 USDT</div>
             </div>
 
             <div class="mb-3">
@@ -139,7 +139,7 @@
 
             <div class="card bg-light border-0 p-3 mb-4">
               <h6 class="mb-2">Estimated Payout</h6>
-              <p class="mb-1">Exchange Rate: <strong>1 USDT = KSH {{ pricing.exchange_rate }}</strong></p>
+              <p class="mb-1">Exchange Rate: <strong>0.1 USDT = KSH {{ pricing.exchange_rate|floatformat:2 }}</strong></p>
               <p class="mb-1">Transaction Fee: <strong>{{ pricing.transaction_fee_percent }}%</strong></p>
               <p class="mb-0 fs-5 fw-bold text-success" id="estimatedAmount">
                 Enter amount to see payout

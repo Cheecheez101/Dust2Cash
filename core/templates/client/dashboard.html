@@ -51,7 +51,7 @@
             <div class="hero-title">Hello {{ profile.first_name }} 👋</div>
             <p class="hero-subtitle">Stay on top of your conversions, monitor agent availability, and move funds at the live exchange rate.</p>
             <div class="metric-group">
-              <span class="metric-chip">Live Rate <strong>1&nbsp;USDT = KSH {{ pricing.exchange_rate }}</strong></span>
+              <span class="metric-chip">Live Rate <strong>0.1&nbsp;USDT = KSH {{ pricing.exchange_rate|floatformat:2 }}</strong></span>
               <span class="metric-chip">Fee {{ pricing.transaction_fee_percent }}%</span>
             </div>
             <div class="hero-cta">

@@ -21,6 +21,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
 from django.db import transaction
+from django.db.models import Count, Q, Exists, OuterRef
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.utils.html import strip_tags
@@ -531,8 +532,6 @@ def agent_send_payment(request, transaction_id):
     
     return render(request, 'agent/send_payment.html', {'transaction': transaction, 'agent': agent})
 
-
-
 def send_notification_to_agent(transaction):
     try:
         agents = AgentProfile.objects.all()
@@ -650,11 +649,13 @@ class AdminDashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         ensure_models_loaded()
         context = super().get_context_data(**kwargs)
+        verified_clients = AccountVerification.objects.filter(limits_unlocked=True).count()
         context.update({
             'client_count': ClientProfile.objects.count(),
             'agent_count': AgentProfile.objects.count(),
             'transaction_count': Transaction.objects.count(),
             'reports_count': Transaction.objects.count(),
+            'verified_client_count': verified_clients,
             'application_count': AgentApplication.objects.filter(status=AgentApplication.STATUS_PENDING).count(),
             'pricing': PricingSettings.get_solo(),
         })
@@ -671,7 +672,26 @@ class AdminClientListView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.model.objects.all()
+        qs = self.model.objects.all().select_related('user').annotate(
+            is_verified=Exists(
+                AccountVerification.objects.filter(user=OuterRef('user_id'), limits_unlocked=True)
+            )
+        )
+        status = self.request.GET.get('verification')
+        if status == 'verified':
+            qs = qs.filter(is_verified=True)
+        elif status == 'pending':
+            qs = qs.filter(is_verified=False)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active_filter'] = self.request.GET.get('verification', '')
+        context['verified_summary'] = AccountVerification.objects.aggregate(
+            verified=Count('id', filter=Q(limits_unlocked=True)),
+            pending=Count('id', filter=Q(limits_unlocked=False))
+        )
+        return context
 
 
 class AdminClientCreateView(CreateView):
@@ -852,7 +872,11 @@ class AdminReportsView(TemplateView):
             'active_filters': {
                 'status': status_filter,
                 'platform': platform_filter,
-            }
+            },
+            'verified_summary': AccountVerification.objects.aggregate(
+                verified=Count('id', filter=Q(limits_unlocked=True)),
+                pending=Count('id', filter=Q(limits_unlocked=False)),
+            ),
         })
         return context
 
@@ -1189,3 +1213,22 @@ def sms_delivery_report(request):
     logger.info('Africa\'s Talking delivery report: %s', data)
     return JsonResponse({'status': 'ok'})
 
+
+@login_required
+def verify_phone_view(request):
+    template = 'client/verify_phone.html'
+    if request.method == 'POST':
+        phone = request.POST.get('phone')
+        if not phone:
+            messages.error(request, 'Enter the phone number linked to your account.')
+            return render(request, template)
+        try:
+            send_otp(phone)
+            request.session['otp_phone'] = phone
+            messages.success(request, 'OTP sent successfully.')
+            return redirect('verify_otp')
+        except ValueError as exc:
+            messages.error(request, str(exc))
+        except Exception:
+            messages.error(request, 'Could not send OTP. Try again in a moment.')
+    return render(request, template)

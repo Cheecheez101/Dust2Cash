@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
-from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest, AgentApplication
+from .models import AdminProfile, ClientProfile, AgentProfile, Transaction, AgentRequest, AgentApplication, AccountVerification
 
 
 @admin.register(AdminProfile)
@@ -11,9 +11,19 @@ class AdminProfileAdmin(admin.ModelAdmin):
 
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'first_name', 'last_name', 'email', 'phone_number', 'created_at')
-    search_fields = ('first_name', 'last_name', 'email', 'phone_number')
-    list_filter = ('created_at',)
+    list_display = ('user', 'first_name', 'last_name', 'email', 'phone_number', 'verification_status', 'created_at')
+    search_fields = ('first_name', 'last_name', 'email', 'phone_number', 'user__username')
+    list_filter = ('created_at', 'user__accountverification__limits_unlocked')
+
+    def verification_status(self, obj):
+        verification = getattr(obj.user, 'accountverification', None)
+        if verification and verification.limits_unlocked:
+            return 'Verified'
+        if verification and (verification.phone_verified or verification.id_uploaded):
+            return 'In progress'
+        return 'Pending'
+
+    verification_status.short_description = 'Verification'
 
 
 @admin.register(AgentProfile)
@@ -65,3 +75,19 @@ class AgentApplicationAdmin(admin.ModelAdmin):
 
     mark_verified.short_description = 'Mark selected applications as verified'
     mark_cancelled.short_description = 'Mark selected applications as cancelled'
+
+
+@admin.register(AccountVerification)
+class AccountVerificationAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'phone_verified',
+        'id_uploaded',
+        'completion_score',
+        'limits_unlocked',
+        'updated_at',
+    )
+    list_filter = ('phone_verified', 'id_uploaded', 'limits_unlocked')
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('completion_score', 'limits_unlocked', 'created_at', 'updated_at')
+    ordering = ('-updated_at',)

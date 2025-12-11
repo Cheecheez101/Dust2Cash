@@ -55,6 +55,14 @@
       </div>
       <div class="col">
         <div class="metric-card">
+          <div class="metric-icon bg-light text-success"><i class="fa fa-shield-alt"></i></div>
+          <p class="metric-label">Verified clients</p>
+          <p class="metric-value">{{ verified_client_count }}</p>
+          <a href="{% url 'admin_clients' %}?verification=verified" class="stretched-link">View verified list</a>
+        </div>
+      </div>
+      <div class="col">
+        <div class="metric-card">
           <div class="metric-icon bg-danger-subtle text-danger"><i class="fa fa-file-alt"></i></div>
           <p class="metric-label">Agent Applications</p>
           <p class="metric-value">{{ application_count }}</p>

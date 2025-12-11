@@ -1,4 +1,5 @@
 from django import forms
+from decimal import Decimal
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import ClientProfile, Transaction, AgentProfile, AgentApplication, PricingSettings, AccountVerification
@@ -78,6 +79,13 @@ class TransactionForm(forms.ModelForm):
             field.required = True
         else:
             field.widget = forms.HiddenInput()
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        minimum = Decimal('0.1')
+        if amount is not None and amount < minimum:
+            raise forms.ValidationError(f'Minimum transaction amount is {minimum} USDT.')
+        return amount
 
 
 class AgentApplicationForm(forms.ModelForm):

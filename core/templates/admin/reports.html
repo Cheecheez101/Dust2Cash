@@ -40,6 +40,18 @@
           </div>
         </div>
       </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5>Verification summary</h5>
+            <p class="text-muted">Phone & ID completion status.</p>
+            <ul class="list-unstyled mb-0 small text-muted">
+              <li>Verified clients: {{ verified_summary.verified|default:0 }}</li>
+              <li>Pending verification: {{ verified_summary.pending|default:0 }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="row g-4">
